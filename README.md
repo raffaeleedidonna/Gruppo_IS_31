@@ -15,14 +15,14 @@ Seguite questi 4 step ogni singola volta che aprite il progetto:
 git pull
 ```
 
-**### 2. Aggiungi la cartella**
+### 2. Aggiungi la cartella
 
 **Una volta finito di lavorare**, mettiti della cartella "01_Progetto_esame" e aggiungi la cartella del gruppo:
 ```bash
 git add Gruppo_IS_31
 ```
 
-**### 3. Fai il commit**
+### 3. Fai il commit
 
 **Una volta aggiunta la cartella**, dici cosa hai modificato o aggiunto:
 ```bash
