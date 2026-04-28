@@ -12,18 +12,22 @@ Seguite questi 4 step ogni singola volta che aprite il progetto:
 **Prima di iniziare a operare**, mettiti in 01_Progetto_esame e aggiorna il tuo PC con quello che hanno fatto gli altri:
 ```bash
 git pull
+```
 
 **### 2. Aggiungi la cartella**
 **Una volta finito di lavorare**, mettiti della cartella "01_Progetto_esame" e aggiungi la cartella del gruppo:
 ```bash
 git add Gruppo_IS_31
+```
 
 **### 3. Fai il commit**
 **Una volta aggiunta la cartella**, dici cosa hai modificato o aggiunto:
 ```bash
 git commit -m "[update]"
+```
 
 **### 4. Carica**
 **Una volta fatto il commit**, esegui il seguente comando:
 ```bash
 git push
+```
