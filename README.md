@@ -10,14 +10,14 @@ Seguite questi 4 step ogni singola volta che aprite il progetto:
 
 ### 1. Prendi le ultime modifiche
 
-**Prima di iniziare a operare**, mettiti in 01_Progetto_esame e aggiorna il tuo PC con quello che hanno fatto gli altri:
+**Prima di iniziare a operare**, mettiti nella cartella **/01_Progetto_esame** e aggiorna il tuo PC con quello che hanno fatto gli altri:
 ```bash
 git pull
 ```
 
 ### 2. Aggiungi la cartella
 
-**Una volta finito di lavorare**, mettiti della cartella "01_Progetto_esame" e aggiungi la cartella del gruppo:
+**Una volta finito di lavorare**, mettiti nella cartella "**/01_Progetto_esame**" e aggiungi la cartella del gruppo:
 ```bash
 git add Gruppo_IS_31
 ```
