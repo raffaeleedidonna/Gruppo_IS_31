@@ -1,2 +1,29 @@
-# ids_esercitazioni
-umberto
+# 🚀 Guida all'uso della Repository
+
+Ciao Team! Per collaborare senza fare pasticci con il codice, dobbiamo seguire tutti lo stesso metodo. Ecco i comandi da usare in ordine ogni volta che lavorate al progetto.
+
+---
+
+## 🛠 Come lavorare (Passo dopo passo)
+
+Seguite questi 4 step ogni singola volta che aprite il progetto:
+
+### 1. Prendi le ultime modifiche
+**Prima di iniziare a operare**, mettiti in 01_Progetto_esame e aggiorna il tuo PC con quello che hanno fatto gli altri:
+```bash
+git pull
+
+**### 2. Aggiungi la cartella**
+**Una volta finito di lavorare**, mettiti della cartella "01_Progetto_esame" e aggiungi la cartella del gruppo:
+```bash
+git add Gruppo_IS_31
+
+**### 3. Fai il commit**
+**Una volta aggiunta la cartella**, dici cosa hai modificato o aggiunto:
+```bash
+git commit -m "[update]"
+
+**### 4. Carica**
+**Una volta fatto il commit**, esegui il seguente comando:
+```bash
+git push
