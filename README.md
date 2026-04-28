@@ -1,6 +1,6 @@
 # 🚀 Guida all'uso della Repository
 
-Ciao Team! Per collaborare senza fare pasticci con il codice, dobbiamo seguire tutti lo stesso metodo. Ecco i comandi da usare in ordine ogni volta che lavorate al progetto.
+Ecco i comandi da usare in ordine ogni volta che lavorate al progetto.
 
 ---
 
@@ -21,6 +21,10 @@ git pull
 ```bash
 git add Gruppo_IS_31
 ```
+⚠️Se hai effettuato modifiche che **non riguardano Visual Paradigm**, dovete aggiungere il (o i) file che hai modificato:
+```bash
+git add file1 file2 filen
+```
 
 ### 3. Fai il commit
 
@@ -29,7 +33,7 @@ git add Gruppo_IS_31
 git commit -m "[update]"
 ```
 
-**### 4. Carica**
+### 4. Carica
 
 **Una volta fatto il commit**, esegui il seguente comando:
 ```bash
