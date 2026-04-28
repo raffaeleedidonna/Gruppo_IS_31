@@ -1,4 +1,4 @@
-# 🚀 Guida all'uso della Repository
+# 🚀 Guida all'uso della Repository per il progetto
 
 Ecco i comandi da usare in ordine ogni volta che lavorate al progetto.
 
@@ -17,11 +17,11 @@ git pull
 
 ### 2. Aggiungi la cartella
 
-**Una volta finito di lavorare**, mettiti nella cartella "**/01_Progetto_esame**" e aggiungi la cartella del gruppo:
+**Una volta finito di lavorare**, mettiti nella cartella **/01_Progetto_esame** e aggiungi la cartella del gruppo:
 ```bash
 git add Gruppo_IS_31
 ```
-⚠️Se hai effettuato modifiche che **non riguardano Visual Paradigm**, dovete aggiungere il (o i) file che hai modificato:
+⚠️Se hai effettuato modifiche che **non riguardano Visual Paradigm**, devi aggiungere il (o i) file che hai modificato:
 ```bash
 git add file1 file2 filen
 ```
