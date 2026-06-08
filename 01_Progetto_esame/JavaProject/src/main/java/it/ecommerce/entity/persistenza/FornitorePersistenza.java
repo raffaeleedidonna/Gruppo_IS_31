@@ -2,30 +2,15 @@ package it.ecommerce.entity.persistenza;
 
 public interface FornitorePersistenza {
 
-    ProdottoDAO prodottoDAO();
+    GestoreTransazioni gestoreTransazioni();
 
-    CategoriaDAO categoriaDAO();
+    CatalogoRepository catalogoRepository();
 
-    UtenteDAO utenteDAO();
+    CategoriaRepository categoriaRepository();
 
-    OrdineDAO ordineDAO();
+    UtenteRepository utenteRepository();
 
-    NotificaDAO notificaDAO();
+    OrdineRepository ordineRepository();
 
-    UnitaDiLavoro apreUnitaDiLavoro();
-
-    default <R> R inTransazione(AzioneTransazionale<R> azione) {
-        UnitaDiLavoro unita = apreUnitaDiLavoro();
-        try {
-            unita.inizia();
-            R risultato = azione.esegui();
-            unita.conferma();
-            return risultato;
-        } catch (RuntimeException errore) {
-            unita.annulla();
-            throw errore;
-        } finally {
-            unita.chiudi();
-        }
-    }
+    NotificaRepository notificaRepository();
 }

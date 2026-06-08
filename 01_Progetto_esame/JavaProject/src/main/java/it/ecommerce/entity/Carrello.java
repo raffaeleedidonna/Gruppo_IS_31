@@ -1,6 +1,5 @@
 package it.ecommerce.entity;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,12 +56,6 @@ public class Carrello {
 
     public boolean isVuoto() {
         return righe.isEmpty();
-    }
-
-    public BigDecimal totale() {
-        return righe.stream()
-                .map(RigaCarrello::subtotale)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public Long getId() {

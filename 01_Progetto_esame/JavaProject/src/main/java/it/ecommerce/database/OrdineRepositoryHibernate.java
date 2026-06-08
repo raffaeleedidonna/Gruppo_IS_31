@@ -7,13 +7,13 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import it.ecommerce.entity.Ordine;
-import it.ecommerce.entity.persistenza.OrdineDAO;
+import it.ecommerce.entity.persistenza.OrdineRepository;
 
-final class OrdineDAOHibernate implements OrdineDAO {
+final class OrdineRepositoryHibernate implements OrdineRepository {
 
     private final SessionFactory sessionFactory;
 
-    OrdineDAOHibernate(SessionFactory sessionFactory) {
+    OrdineRepositoryHibernate(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 

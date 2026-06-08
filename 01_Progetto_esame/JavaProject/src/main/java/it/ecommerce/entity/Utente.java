@@ -30,24 +30,16 @@ public abstract class Utente {
     @Column(nullable = false)
     private String passwordHash;
 
-    @Column(nullable = false)
-    private String nome;
-
-    @Column(nullable = false)
-    private String cognome;
-
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "profilo_id")
+    @JoinColumn(name = "profilo_id", nullable = false)
     private Profilo profilo;
 
     protected Utente() {
     }
 
-    protected Utente(String email, String passwordInChiaro, String nome, String cognome, Profilo profilo) {
+    protected Utente(String email, String passwordInChiaro, Profilo profilo) {
         this.email = email;
         this.passwordHash = Password.hash(passwordInChiaro);
-        this.nome = nome;
-        this.cognome = cognome;
         this.profilo = profilo;
     }
 
@@ -63,14 +55,6 @@ public abstract class Utente {
 
     public String getEmail() {
         return email;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public String getCognome() {
-        return cognome;
     }
 
     public Profilo getProfilo() {

@@ -10,6 +10,7 @@ import it.ecommerce.entity.Cliente;
 import it.ecommerce.entity.Notifica;
 import it.ecommerce.entity.Ordine;
 import it.ecommerce.entity.Prodotto;
+import it.ecommerce.entity.ProdottoCatalogo;
 import it.ecommerce.entity.Profilo;
 import it.ecommerce.entity.RigaCarrello;
 import it.ecommerce.entity.RigaOrdine;
@@ -27,6 +28,7 @@ final class SessionFactoryProvider {
             Configuration configurazione = new Configuration().configure();
             configurazione.addAnnotatedClass(Categoria.class);
             configurazione.addAnnotatedClass(Prodotto.class);
+            configurazione.addAnnotatedClass(ProdottoCatalogo.class);
             configurazione.addAnnotatedClass(Profilo.class);
             configurazione.addAnnotatedClass(Utente.class);
             configurazione.addAnnotatedClass(Amministratore.class);

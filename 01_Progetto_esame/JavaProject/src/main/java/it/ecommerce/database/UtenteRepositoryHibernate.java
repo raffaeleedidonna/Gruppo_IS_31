@@ -6,13 +6,13 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import it.ecommerce.entity.Utente;
-import it.ecommerce.entity.persistenza.UtenteDAO;
+import it.ecommerce.entity.persistenza.UtenteRepository;
 
-final class UtenteDAOHibernate implements UtenteDAO {
+final class UtenteRepositoryHibernate implements UtenteRepository {
 
     private final SessionFactory sessionFactory;
 
-    UtenteDAOHibernate(SessionFactory sessionFactory) {
+    UtenteRepositoryHibernate(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 

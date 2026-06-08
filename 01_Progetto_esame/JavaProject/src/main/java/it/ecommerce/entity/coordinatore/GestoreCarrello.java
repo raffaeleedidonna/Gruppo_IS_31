@@ -1,47 +1,53 @@
 package it.ecommerce.entity.coordinatore;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
 import it.ecommerce.entity.Carrello;
 import it.ecommerce.entity.Cliente;
 import it.ecommerce.entity.EccezioneValidazione;
 import it.ecommerce.entity.Prodotto;
+import it.ecommerce.entity.ProdottoCatalogo;
 import it.ecommerce.entity.RigaCarrello;
 import it.ecommerce.entity.Utente;
-import it.ecommerce.entity.persistenza.FornitorePersistenza;
-import it.ecommerce.entity.persistenza.RegistroPersistenza;
+import it.ecommerce.entity.persistenza.CatalogoRepository;
+import it.ecommerce.entity.persistenza.GestoreTransazioni;
+import it.ecommerce.entity.persistenza.UtenteRepository;
 
 public class GestoreCarrello {
 
-    private final FornitorePersistenza fornitore;
+    private final GestoreTransazioni transazioni;
+    private final UtenteRepository utenti;
+    private final CatalogoRepository catalogo;
 
-    public GestoreCarrello() {
-        this(RegistroPersistenza.fornitore());
+    public GestoreCarrello(GestoreTransazioni transazioni, UtenteRepository utenti, CatalogoRepository catalogo) {
+        this.transazioni = transazioni;
+        this.utenti = utenti;
+        this.catalogo = catalogo;
     }
 
-    public GestoreCarrello(FornitorePersistenza fornitore) {
-        this.fornitore = fornitore;
-    }
-
-    public Carrello aggiungiAlCarrello(Long clienteId, Long prodottoId, int quantita) {
-        return fornitore.inTransazione(() -> {
+    public VistaCarrello aggiungiAlCarrello(Long clienteId, Long prodottoId, int quantita) {
+        return transazioni.inTransazione(() -> {
             if (quantita <= 0) {
                 throw new EccezioneValidazione("La quantità deve essere positiva.");
             }
             Cliente cliente = clienteValido(clienteId);
-            Prodotto prodotto = fornitore.prodottoDAO().perId(prodottoId)
+            ProdottoCatalogo voce = catalogo.vocePerProdotto(prodottoId)
                     .orElseThrow(() -> new EccezioneValidazione("Prodotto non trovato."));
             Carrello carrello = cliente.carrelloCorrente();
-            int quantitaRisultante = carrello.quantitaProdotto(prodotto) + quantita;
-            if (!prodotto.disponibilitaSufficiente(quantitaRisultante)) {
+            int quantitaRisultante = carrello.quantitaProdotto(voce.getProdotto()) + quantita;
+            if (!voce.disponibilitaSufficiente(quantitaRisultante)) {
                 throw new EccezioneValidazione("Prodotto non disponibile nella quantità richiesta.");
             }
-            carrello.aggiungi(prodotto, quantita);
-            fornitore.utenteDAO().salva(cliente);
-            return inizializza(carrello);
+            carrello.aggiungi(voce.getProdotto(), quantita);
+            utenti.salva(cliente);
+            return vista(carrello);
         });
     }
 
-    public Carrello modificaQuantita(Long clienteId, Long rigaCarrelloId, int quantitaDesiderata) {
-        return fornitore.inTransazione(() -> {
+    public VistaCarrello modificaQuantita(Long clienteId, Long rigaCarrelloId, int quantitaDesiderata) {
+        return transazioni.inTransazione(() -> {
             Cliente cliente = clienteValido(clienteId);
             Carrello carrello = cliente.getCarrello();
             if (carrello == null) {
@@ -52,24 +58,25 @@ public class GestoreCarrello {
                 throw new EccezioneValidazione("Elemento non presente nel carrello.");
             }
             if (quantitaDesiderata > 0) {
-                if (quantitaDesiderata > riga.getProdotto().getQuantitaMagazzino()) {
+                ProdottoCatalogo voce = voceDi(riga.getProdotto());
+                if (voce == null || !voce.disponibilitaSufficiente(quantitaDesiderata)) {
                     throw new EccezioneValidazione("Quantità superiore alla disponibilità.");
                 }
                 riga.impostaQuantita(quantitaDesiderata);
             } else {
                 carrello.rimuoviRiga(riga);
             }
-            fornitore.utenteDAO().salva(cliente);
-            return inizializza(carrello);
+            utenti.salva(cliente);
+            return vista(carrello);
         });
     }
 
-    public Carrello carrello(Long clienteId) {
-        return fornitore.inTransazione(() -> inizializza(clienteValido(clienteId).getCarrello()));
+    public VistaCarrello carrello(Long clienteId) {
+        return transazioni.inTransazione(() -> vista(clienteValido(clienteId).getCarrello()));
     }
 
     private Cliente clienteValido(Long clienteId) {
-        Utente utente = fornitore.utenteDAO().perId(clienteId)
+        Utente utente = utenti.perId(clienteId)
                 .orElseThrow(() -> new EccezioneValidazione("Utente non trovato."));
         if (!(utente instanceof Cliente cliente)) {
             throw new EccezioneValidazione("Operazione consentita solo ai clienti.");
@@ -77,10 +84,24 @@ public class GestoreCarrello {
         return cliente;
     }
 
-    private Carrello inizializza(Carrello carrello) {
-        if (carrello != null) {
-            carrello.getRighe().size();
+    private ProdottoCatalogo voceDi(Prodotto prodotto) {
+        return catalogo.vocePerProdotto(prodotto.getId()).orElse(null);
+    }
+
+    private VistaCarrello vista(Carrello carrello) {
+        if (carrello == null) {
+            return new VistaCarrello(null, List.of(), BigDecimal.ZERO);
         }
-        return carrello;
+        List<VistaRigaCarrello> righe = new ArrayList<>();
+        BigDecimal totale = BigDecimal.ZERO;
+        for (RigaCarrello riga : carrello.getRighe()) {
+            ProdottoCatalogo voce = voceDi(riga.getProdotto());
+            BigDecimal prezzo = voce == null ? BigDecimal.ZERO : voce.getPrezzoAttuale();
+            int disponibile = voce == null ? 0 : voce.getQuantitaMagazzino();
+            righe.add(new VistaRigaCarrello(riga.getId(), riga.getProdotto().getId(),
+                    riga.getProdotto().getNome(), prezzo, riga.getQuantita(), disponibile));
+            totale = totale.add(prezzo.multiply(BigDecimal.valueOf(riga.getQuantita())));
+        }
+        return new VistaCarrello(carrello.getId(), righe, totale);
     }
 }

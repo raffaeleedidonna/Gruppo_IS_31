@@ -16,28 +16,28 @@ import org.junit.jupiter.api.Test;
 import it.ecommerce.control.dto.EsitoDTO;
 import it.ecommerce.control.dto.ProdottoDTO;
 import it.ecommerce.entity.Categoria;
+import it.ecommerce.entity.Cliente;
+import it.ecommerce.entity.Ordine;
 import it.ecommerce.entity.Prodotto;
+import it.ecommerce.entity.ProdottoCatalogo;
+import it.ecommerce.entity.Profilo;
 import it.ecommerce.entity.coordinatore.GestoreProdotti;
-import it.ecommerce.entity.persistenza.AzioneTransazionale;
-import it.ecommerce.entity.persistenza.CategoriaDAO;
-import it.ecommerce.entity.persistenza.FornitorePersistenza;
-import it.ecommerce.entity.persistenza.NotificaDAO;
-import it.ecommerce.entity.persistenza.OrdineDAO;
-import it.ecommerce.entity.persistenza.ProdottoDAO;
-import it.ecommerce.entity.persistenza.UnitaDiLavoro;
-import it.ecommerce.entity.persistenza.UtenteDAO;
+import it.ecommerce.entity.persistenza.CatalogoRepository;
+import it.ecommerce.entity.persistenza.CategoriaRepository;
 
 class GestioneProdottiControllerImplTest {
 
-    private GestioneProdottiController controllerCon(FornitorePersistenzaFinto fornitore) {
-        return new GestioneProdottiControllerImpl(new GestoreProdotti(fornitore));
+    private GestioneProdottiController controllerCon(CatalogoFinto catalogo, CategorieFinto categorie) {
+        return new GestioneProdottiControllerImpl(
+                new GestoreProdotti(new TransazioniDirette(), catalogo, categorie));
     }
 
     @Test
     void aggiungeUnProdottoValido() {
-        FornitorePersistenzaFinto fornitore = new FornitorePersistenzaFinto();
-        fornitore.aggiungiCategoria(1L, "Elettronica");
-        GestioneProdottiController controller = controllerCon(fornitore);
+        CatalogoFinto catalogo = new CatalogoFinto();
+        CategorieFinto categorie = new CategorieFinto();
+        categorie.aggiungi(1L, "Elettronica");
+        GestioneProdottiController controller = controllerCon(catalogo, categorie);
 
         EsitoDTO<ProdottoDTO> esito = controller.aggiungiProdotto(new ProdottoDTO(
                 null, "Tastiera", "meccanica", new BigDecimal("49.90"), 10, true, false, 1L, null));
@@ -48,9 +48,10 @@ class GestioneProdottiControllerImplTest {
 
     @Test
     void rifiutaQuantitaNegativa() {
-        FornitorePersistenzaFinto fornitore = new FornitorePersistenzaFinto();
-        fornitore.aggiungiCategoria(1L, "Elettronica");
-        GestioneProdottiController controller = controllerCon(fornitore);
+        CatalogoFinto catalogo = new CatalogoFinto();
+        CategorieFinto categorie = new CategorieFinto();
+        categorie.aggiungi(1L, "Elettronica");
+        GestioneProdottiController controller = controllerCon(catalogo, categorie);
 
         EsitoDTO<ProdottoDTO> esito = controller.aggiungiProdotto(new ProdottoDTO(
                 null, "Monitor", "27 pollici", new BigDecimal("199.00"), -1, true, false, 1L, null));
@@ -62,11 +63,11 @@ class GestioneProdottiControllerImplTest {
 
     @Test
     void rifiutaNomeDuplicato() {
-        FornitorePersistenzaFinto fornitore = new FornitorePersistenzaFinto();
-        fornitore.aggiungiCategoria(1L, "Elettronica");
-        fornitore.aggiungiProdottoEsistente(new Prodotto("Mouse", "wireless",
-                new BigDecimal("19.90"), 5, true, false));
-        GestioneProdottiController controller = controllerCon(fornitore);
+        CatalogoFinto catalogo = new CatalogoFinto();
+        CategorieFinto categorie = new CategorieFinto();
+        categorie.aggiungi(1L, "Elettronica");
+        catalogo.aggiungiVoceEsistente("Mouse", new Categoria("Elettronica"));
+        GestioneProdottiController controller = controllerCon(catalogo, categorie);
 
         EsitoDTO<ProdottoDTO> esito = controller.aggiungiProdotto(new ProdottoDTO(
                 null, "Mouse", "altro", new BigDecimal("21.00"), 3, true, false, 1L, null));
@@ -77,8 +78,9 @@ class GestioneProdottiControllerImplTest {
 
     @Test
     void rifiutaCategoriaNonValida() {
-        FornitorePersistenzaFinto fornitore = new FornitorePersistenzaFinto();
-        GestioneProdottiController controller = controllerCon(fornitore);
+        CatalogoFinto catalogo = new CatalogoFinto();
+        CategorieFinto categorie = new CategorieFinto();
+        GestioneProdottiController controller = controllerCon(catalogo, categorie);
 
         EsitoDTO<ProdottoDTO> esito = controller.aggiungiProdotto(new ProdottoDTO(
                 null, "Webcam", "full hd", new BigDecimal("39.90"), 8, true, false, 99L, null));
@@ -87,99 +89,84 @@ class GestioneProdottiControllerImplTest {
         assertTrue(esito.messaggio().contains("Categoria"));
     }
 
-    private static final class FornitorePersistenzaFinto implements FornitorePersistenza {
+    @Test
+    void rimozioneDalCatalogoMantieneProdottoPerStoricoOrdine() {
+        CatalogoFinto catalogo = new CatalogoFinto();
+        CategorieFinto categorie = new CategorieFinto();
+        categorie.aggiungi(1L, "Elettronica");
+        GestoreProdotti gestore = new GestoreProdotti(new TransazioniDirette(), catalogo, categorie);
+        ProdottoCatalogo voce = gestore.aggiungi("Mouse", "wireless",
+                new BigDecimal("19.90"), 5, true, false, 1L);
+        SupportoTest.assegnaId(voce.getProdotto(), 7L);
 
-        private final ProdottoDAOFinto prodotti = new ProdottoDAOFinto();
-        private final CategoriaDAOFinto categorie = new CategoriaDAOFinto();
+        Ordine ordine = new Ordine(new Cliente("c@x.it", "pw", new Profilo("M", "R", null, null)), "Via Test 1");
+        ordine.aggiungiRiga(voce.getProdotto(), 2, voce.getPrezzoAttuale());
 
-        void aggiungiCategoria(Long id, String nome) {
-            categorie.aggiungi(id, nome);
-        }
+        gestore.rimuoviDalCatalogo(7L);
 
-        void aggiungiProdottoEsistente(Prodotto prodotto) {
-            prodotti.salva(prodotto);
-        }
-
-        @Override
-        public ProdottoDAO prodottoDAO() {
-            return prodotti;
-        }
-
-        @Override
-        public CategoriaDAO categoriaDAO() {
-            return categorie;
-        }
-
-        @Override
-        public UtenteDAO utenteDAO() {
-            return null;
-        }
-
-        @Override
-        public OrdineDAO ordineDAO() {
-            return null;
-        }
-
-        @Override
-        public NotificaDAO notificaDAO() {
-            return null;
-        }
-
-        @Override
-        public UnitaDiLavoro apreUnitaDiLavoro() {
-            return new UnitaDiLavoroFinta();
-        }
-
-        @Override
-        public <R> R inTransazione(AzioneTransazionale<R> azione) {
-            return azione.esegui();
-        }
+        assertTrue(catalogo.tutte().isEmpty());
+        assertEquals("Mouse", ordine.getRighe().get(0).getProdotto().getNome());
+        assertEquals(0, new BigDecimal("19.90").compareTo(ordine.getRighe().get(0).getPrezzoDiAcquisto()));
     }
 
-    private static final class ProdottoDAOFinto implements ProdottoDAO {
+    private static final class CatalogoFinto implements CatalogoRepository {
 
-        private final List<Prodotto> dati = new ArrayList<>();
+        private final List<ProdottoCatalogo> voci = new ArrayList<>();
+
+        void aggiungiVoceEsistente(String nome, Categoria categoria) {
+            Prodotto prodotto = new Prodotto(nome, "", categoria);
+            voci.add(new ProdottoCatalogo(prodotto, new BigDecimal("1.00"), 1, true, false));
+        }
 
         @Override
-        public Prodotto salva(Prodotto prodotto) {
-            if (!dati.contains(prodotto)) {
-                dati.add(prodotto);
+        public ProdottoCatalogo salva(ProdottoCatalogo voce) {
+            if (!voci.contains(voce)) {
+                voci.add(voce);
             }
-            return prodotto;
+            return voce;
         }
 
         @Override
-        public Optional<Prodotto> perId(Long id) {
-            return Optional.empty();
+        public void rimuovi(ProdottoCatalogo voce) {
+            voci.remove(voce);
         }
 
         @Override
-        public List<Prodotto> tuttiNelCatalogo() {
-            return dati.stream().filter(Prodotto::isPresenteNelCatalogo).toList();
+        public Optional<ProdottoCatalogo> vocePerProdotto(Long prodottoId) {
+            return voci.stream()
+                    .filter(voce -> voce.getProdotto().getId() != null
+                            && voce.getProdotto().getId().equals(prodottoId))
+                    .findFirst();
         }
 
         @Override
-        public List<Prodotto> inOfferta() {
+        public List<ProdottoCatalogo> tutte() {
+            return voci;
+        }
+
+        @Override
+        public List<ProdottoCatalogo> inOfferta() {
+            return voci.stream().filter(ProdottoCatalogo::isInOfferta).toList();
+        }
+
+        @Override
+        public List<ProdottoCatalogo> cerca(String termine) {
             return List.of();
         }
 
         @Override
-        public List<Prodotto> cerca(String termine) {
-            return List.of();
+        public boolean esisteProdottoPerNome(String nome) {
+            return voci.stream()
+                    .anyMatch(voce -> voce.getProdotto().getNome().equalsIgnoreCase(nome));
         }
 
         @Override
-        public boolean esistePerNome(String nome) {
-            return dati.stream().anyMatch(prodotto -> prodotto.getNome().equalsIgnoreCase(nome));
-        }
-
-        @Override
-        public List<Prodotto> perCategoria(Long categoriaId) {
-            return List.of();
+        public long conta() {
+            return voci.size();
         }
     }
 
-    private static final class CategoriaDAOFinto implements CategoriaDAO {
+    private static final class CategorieFinto implements CategoriaRepository {
 
         private final Map<Long, Categoria> dati = new LinkedHashMap<>();
 
@@ -206,26 +193,7 @@ class GestioneProdottiControllerImplTest {
 
         @Override
         public List<Categoria> tutte() {
-            return new ArrayList<>(dati.values());
-        }
-    }
-
-    private static final class UnitaDiLavoroFinta implements UnitaDiLavoro {
-
-        @Override
-        public void inizia() {
-        }
-
-        @Override
-        public void conferma() {
-        }
-
-        @Override
-        public void annulla() {
-        }
-
-        @Override
-        public void chiudi() {
+            return new java.util.ArrayList<>(dati.values());
         }
     }
 }

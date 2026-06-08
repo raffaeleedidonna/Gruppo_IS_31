@@ -12,10 +12,6 @@ public class AutenticazioneControllerImpl implements AutenticazioneController {
 
     private final GestoreAutenticazione gestore;
 
-    public AutenticazioneControllerImpl() {
-        this(new GestoreAutenticazione());
-    }
-
     public AutenticazioneControllerImpl(GestoreAutenticazione gestore) {
         this.gestore = gestore;
     }
@@ -24,7 +20,7 @@ public class AutenticazioneControllerImpl implements AutenticazioneController {
     public EsitoDTO<UtenteDTO> autentica(CredenzialiDTO credenziali) {
         try {
             Utente utente = gestore.autentica(credenziali.email(), credenziali.password());
-            return EsitoDTO.successo("Benvenuto " + utente.getNome() + "!", aDTO(utente));
+            return EsitoDTO.successo("Benvenuto " + utente.getProfilo().getNome() + "!", aDTO(utente));
         } catch (EccezioneValidazione errore) {
             return EsitoDTO.errore(errore.getMessage());
         }
@@ -33,7 +29,8 @@ public class AutenticazioneControllerImpl implements AutenticazioneController {
     @Override
     public EsitoDTO<UtenteDTO> registra(RegistrazioneDTO dati) {
         try {
-            Utente utente = gestore.registra(dati.nome(), dati.cognome(), dati.email(), dati.password());
+            Utente utente = gestore.registra(dati.nome(), dati.cognome(), dati.email(), dati.password(),
+                    dati.indirizzoSpedizione(), dati.immagineProfilo());
             return EsitoDTO.successo("Registrazione completata. Ora puoi accedere.", aDTO(utente));
         } catch (EccezioneValidazione errore) {
             return EsitoDTO.errore(errore.getMessage());
@@ -41,7 +38,7 @@ public class AutenticazioneControllerImpl implements AutenticazioneController {
     }
 
     private UtenteDTO aDTO(Utente utente) {
-        return new UtenteDTO(utente.getId(), utente.getEmail(), utente.getNome(),
-                utente.getCognome(), utente.ruolo());
+        return new UtenteDTO(utente.getId(), utente.getEmail(), utente.getProfilo().getNome(),
+                utente.getProfilo().getCognome(), utente.ruolo());
     }
 }

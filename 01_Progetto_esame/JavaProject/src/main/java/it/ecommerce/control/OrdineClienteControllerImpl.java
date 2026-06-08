@@ -13,10 +13,6 @@ public class OrdineClienteControllerImpl implements OrdineClienteController {
 
     private final GestoreOrdiniCliente gestore;
 
-    public OrdineClienteControllerImpl() {
-        this(new GestoreOrdiniCliente());
-    }
-
     public OrdineClienteControllerImpl(GestoreOrdiniCliente gestore) {
         this.gestore = gestore;
     }

@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import it.ecommerce.entity.Categoria;
 
-public interface CategoriaDAO {
+public interface CategoriaRepository {
 
     Categoria salva(Categoria categoria);
 

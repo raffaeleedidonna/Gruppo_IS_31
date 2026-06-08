@@ -6,13 +6,13 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import it.ecommerce.entity.Notifica;
-import it.ecommerce.entity.persistenza.NotificaDAO;
+import it.ecommerce.entity.persistenza.NotificaRepository;
 
-final class NotificaDAOHibernate implements NotificaDAO {
+final class NotificaRepositoryHibernate implements NotificaRepository {
 
     private final SessionFactory sessionFactory;
 
-    NotificaDAOHibernate(SessionFactory sessionFactory) {
+    NotificaRepositoryHibernate(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 

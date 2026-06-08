@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import it.ecommerce.entity.Utente;
 
-public interface UtenteDAO {
+public interface UtenteRepository {
 
     Utente salva(Utente utente);
 

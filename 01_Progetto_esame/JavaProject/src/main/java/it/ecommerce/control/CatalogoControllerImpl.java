@@ -10,10 +10,6 @@ public class CatalogoControllerImpl implements CatalogoController {
 
     private final GestoreCatalogo gestore;
 
-    public CatalogoControllerImpl() {
-        this(new GestoreCatalogo());
-    }
-
     public CatalogoControllerImpl(GestoreCatalogo gestore) {
         this.gestore = gestore;
     }

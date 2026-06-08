@@ -10,8 +10,8 @@ public class Amministratore extends Utente {
     protected Amministratore() {
     }
 
-    public Amministratore(String email, String passwordInChiaro, String nome, String cognome, Profilo profilo) {
-        super(email, passwordInChiaro, nome, cognome, profilo);
+    public Amministratore(String email, String passwordInChiaro, Profilo profilo) {
+        super(email, passwordInChiaro, profilo);
     }
 
     @Override

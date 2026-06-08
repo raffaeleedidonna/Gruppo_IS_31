@@ -6,48 +6,50 @@ import it.ecommerce.entity.EccezioneValidazione;
 import it.ecommerce.entity.Ordine;
 import it.ecommerce.entity.RigaOrdine;
 import it.ecommerce.entity.StatoOrdine;
-import it.ecommerce.entity.persistenza.FornitorePersistenza;
-import it.ecommerce.entity.persistenza.RegistroPersistenza;
+import it.ecommerce.entity.persistenza.CatalogoRepository;
+import it.ecommerce.entity.persistenza.GestoreTransazioni;
+import it.ecommerce.entity.persistenza.OrdineRepository;
 
 public class GestoreOrdini {
 
-    private final FornitorePersistenza fornitore;
+    private final GestoreTransazioni transazioni;
+    private final OrdineRepository ordini;
+    private final CatalogoRepository catalogo;
 
-    public GestoreOrdini() {
-        this(RegistroPersistenza.fornitore());
-    }
-
-    public GestoreOrdini(FornitorePersistenza fornitore) {
-        this.fornitore = fornitore;
+    public GestoreOrdini(GestoreTransazioni transazioni, OrdineRepository ordini, CatalogoRepository catalogo) {
+        this.transazioni = transazioni;
+        this.ordini = ordini;
+        this.catalogo = catalogo;
     }
 
     public List<Ordine> elencoOrdini() {
-        return fornitore.inTransazione(() -> fornitore.ordineDAO().tutti());
+        return transazioni.inTransazione(ordini::tutti);
     }
 
     public Ordine dettaglio(Long ordineId) {
-        return fornitore.inTransazione(() -> {
-            Ordine ordine = fornitore.ordineDAO().perId(ordineId).orElse(null);
+        return transazioni.inTransazione(() -> {
+            Ordine ordine = ordini.perId(ordineId).orElse(null);
             return ordine == null ? null : inizializza(ordine);
         });
     }
 
     public Ordine aggiornaStato(Long ordineId, StatoOrdine nuovoStato) {
-        return fornitore.inTransazione(() -> {
-            Ordine ordine = fornitore.ordineDAO().perId(ordineId)
+        return transazioni.inTransazione(() -> {
+            Ordine ordine = ordini.perId(ordineId)
                     .orElseThrow(() -> new EccezioneValidazione("Ordine non trovato."));
             if (nuovoStato == StatoOrdine.ANNULLATO && ordine.getStato() != StatoOrdine.ANNULLATO) {
                 annulla(ordine);
             } else {
                 ordine.cambiaStato(nuovoStato);
             }
-            return inizializza(fornitore.ordineDAO().salva(ordine));
+            return inizializza(ordini.salva(ordine));
         });
     }
 
     private void annulla(Ordine ordine) {
         for (RigaOrdine riga : ordine.getRighe()) {
-            riga.getProdotto().incrementaMagazzino(riga.getQuantitaAcquistata());
+            catalogo.vocePerProdotto(riga.getProdotto().getId())
+                    .ifPresent(voce -> voce.incrementaMagazzino(riga.getQuantitaAcquistata()));
         }
         ordine.cambiaStato(StatoOrdine.ANNULLATO);
     }

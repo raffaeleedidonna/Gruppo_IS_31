@@ -4,7 +4,7 @@ import java.util.List;
 
 import it.ecommerce.entity.Notifica;
 
-public interface NotificaDAO {
+public interface NotificaRepository {
 
     Notifica salva(Notifica notifica);
 

@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import it.ecommerce.entity.Ordine;
 
-public interface OrdineDAO {
+public interface OrdineRepository {
 
     Ordine salva(Ordine ordine);
 

@@ -1,7 +1,5 @@
 package it.ecommerce.entity;
 
-import java.math.BigDecimal;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -45,10 +43,6 @@ public class RigaCarrello {
 
     public void impostaQuantita(int quantita) {
         this.quantita = quantita;
-    }
-
-    public BigDecimal subtotale() {
-        return prodotto.getPrezzoAttuale().multiply(BigDecimal.valueOf(quantita));
     }
 
     public Long getId() {

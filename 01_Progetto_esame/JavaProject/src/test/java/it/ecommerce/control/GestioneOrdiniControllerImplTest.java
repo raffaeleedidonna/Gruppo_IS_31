@@ -12,132 +12,148 @@ import org.junit.jupiter.api.Test;
 import it.ecommerce.control.dto.EsitoDTO;
 import it.ecommerce.control.dto.OrdineDTO;
 import it.ecommerce.control.dto.StatoOrdineDTO;
+import it.ecommerce.entity.Categoria;
 import it.ecommerce.entity.Cliente;
 import it.ecommerce.entity.Ordine;
 import it.ecommerce.entity.Prodotto;
+import it.ecommerce.entity.ProdottoCatalogo;
 import it.ecommerce.entity.Profilo;
 import it.ecommerce.entity.StatoOrdine;
 import it.ecommerce.entity.coordinatore.GestoreOrdini;
-import it.ecommerce.entity.persistenza.AzioneTransazionale;
-import it.ecommerce.entity.persistenza.CategoriaDAO;
-import it.ecommerce.entity.persistenza.FornitorePersistenza;
-import it.ecommerce.entity.persistenza.NotificaDAO;
-import it.ecommerce.entity.persistenza.OrdineDAO;
-import it.ecommerce.entity.persistenza.ProdottoDAO;
-import it.ecommerce.entity.persistenza.UnitaDiLavoro;
-import it.ecommerce.entity.persistenza.UtenteDAO;
+import it.ecommerce.entity.persistenza.CatalogoRepository;
+import it.ecommerce.entity.persistenza.OrdineRepository;
 
 class GestioneOrdiniControllerImplTest {
 
-    private GestioneOrdiniController controllerCon(Ordine ordine) {
-        return new GestioneOrdiniControllerImpl(new GestoreOrdini(new FornitoreOrdiniFinto(ordine)));
+    private ProdottoCatalogo voce(int magazzino) {
+        Prodotto prodotto = new Prodotto("X", "", new Categoria("Cat"));
+        SupportoTest.assegnaId(prodotto, 1L);
+        return new ProdottoCatalogo(prodotto, new BigDecimal("5.00"), magazzino, true, false);
     }
 
-    private Ordine ordineConRiga(Prodotto prodotto, int quantita) {
-        Ordine ordine = new Ordine(new Cliente("c@x.it", "pw", "M", "R", new Profilo()), "Via Test 1");
-        ordine.aggiungiRiga(prodotto, quantita, prodotto.getPrezzoAttuale());
+    private Ordine ordineConRiga(ProdottoCatalogo voce, int quantita) {
+        Ordine ordine = new Ordine(new Cliente("c@x.it", "pw", new Profilo("M", "R", null, null)), "Via Test 1");
+        ordine.aggiungiRiga(voce.getProdotto(), quantita, voce.getPrezzoAttuale());
         return ordine;
+    }
+
+    private GestioneOrdiniController controllerCon(Ordine ordine, ProdottoCatalogo voce) {
+        return new GestioneOrdiniControllerImpl(new GestoreOrdini(
+                new TransazioniDirette(), new OrdineFinto(ordine), new CatalogoFinto(voce)));
     }
 
     @Test
     void annullamentoRipristinaLoStock() {
-        Prodotto prodotto = new Prodotto("X", "", new BigDecimal("5.00"), 2, true, false);
-        Ordine ordine = ordineConRiga(prodotto, 3);
+        ProdottoCatalogo voce = voce(2);
+        Ordine ordine = ordineConRiga(voce, 3);
 
-        EsitoDTO<OrdineDTO> esito = controllerCon(ordine).aggiornaStato(10L, StatoOrdineDTO.ANNULLATO);
+        EsitoDTO<OrdineDTO> esito = controllerCon(ordine, voce).aggiornaStato(10L, StatoOrdineDTO.ANNULLATO);
 
         assertTrue(esito.successo());
         assertEquals("Ordine annullato con successo", esito.messaggio());
-        assertEquals(5, prodotto.getQuantitaMagazzino());
+        assertEquals(5, voce.getQuantitaMagazzino());
         assertEquals(StatoOrdine.ANNULLATO, ordine.getStato());
     }
 
     @Test
     void aggiornamentoDiStatoNonAnnullatoNonToccaLoStock() {
-        Prodotto prodotto = new Prodotto("X", "", new BigDecimal("5.00"), 2, true, false);
-        Ordine ordine = ordineConRiga(prodotto, 3);
+        ProdottoCatalogo voce = voce(2);
+        Ordine ordine = ordineConRiga(voce, 3);
 
-        EsitoDTO<OrdineDTO> esito = controllerCon(ordine).aggiornaStato(10L, StatoOrdineDTO.SPEDITO);
+        EsitoDTO<OrdineDTO> esito = controllerCon(ordine, voce).aggiornaStato(10L, StatoOrdineDTO.SPEDITO);
 
         assertTrue(esito.successo());
-        assertEquals(2, prodotto.getQuantitaMagazzino());
+        assertEquals(2, voce.getQuantitaMagazzino());
         assertEquals(StatoOrdine.SPEDITO, ordine.getStato());
     }
 
     @Test
     void doppioAnnullamentoNonRaddoppiaLoStock() {
-        Prodotto prodotto = new Prodotto("X", "", new BigDecimal("5.00"), 2, true, false);
-        Ordine ordine = ordineConRiga(prodotto, 3);
-        GestioneOrdiniController controller = controllerCon(ordine);
+        ProdottoCatalogo voce = voce(2);
+        Ordine ordine = ordineConRiga(voce, 3);
+        GestioneOrdiniController controller = controllerCon(ordine, voce);
 
         controller.aggiornaStato(10L, StatoOrdineDTO.ANNULLATO);
         controller.aggiornaStato(10L, StatoOrdineDTO.ANNULLATO);
 
-        assertEquals(5, prodotto.getQuantitaMagazzino());
+        assertEquals(5, voce.getQuantitaMagazzino());
         assertEquals(StatoOrdine.ANNULLATO, ordine.getStato());
     }
 
-    private static final class FornitoreOrdiniFinto implements FornitorePersistenza {
+    private static final class OrdineFinto implements OrdineRepository {
 
         private final Ordine ordine;
 
-        FornitoreOrdiniFinto(Ordine ordine) {
+        OrdineFinto(Ordine ordine) {
             this.ordine = ordine;
         }
 
         @Override
-        public <R> R inTransazione(AzioneTransazionale<R> azione) {
-            return azione.esegui();
+        public Ordine salva(Ordine ordineDaSalvare) {
+            return ordineDaSalvare;
         }
 
         @Override
-        public OrdineDAO ordineDAO() {
-            return new OrdineDAO() {
-                @Override
-                public Ordine salva(Ordine ordineDaSalvare) {
-                    return ordineDaSalvare;
-                }
-
-                @Override
-                public Optional<Ordine> perId(Long id) {
-                    return Optional.of(ordine);
-                }
-
-                @Override
-                public List<Ordine> tutti() {
-                    return List.of(ordine);
-                }
-
-                @Override
-                public List<Ordine> perCliente(Long clienteId) {
-                    return List.of(ordine);
-                }
-            };
+        public Optional<Ordine> perId(Long id) {
+            return Optional.of(ordine);
         }
 
         @Override
-        public ProdottoDAO prodottoDAO() {
-            return null;
+        public List<Ordine> tutti() {
+            return List.of(ordine);
         }
 
         @Override
-        public CategoriaDAO categoriaDAO() {
-            return null;
+        public List<Ordine> perCliente(Long clienteId) {
+            return List.of(ordine);
+        }
+    }
+
+    private static final class CatalogoFinto implements CatalogoRepository {
+
+        private final ProdottoCatalogo voce;
+
+        CatalogoFinto(ProdottoCatalogo voce) {
+            this.voce = voce;
         }
 
         @Override
-        public UtenteDAO utenteDAO() {
-            return null;
+        public ProdottoCatalogo salva(ProdottoCatalogo voceDaSalvare) {
+            return voceDaSalvare;
         }
 
         @Override
-        public NotificaDAO notificaDAO() {
-            return null;
+        public void rimuovi(ProdottoCatalogo voceDaRimuovere) {
         }
 
         @Override
-        public UnitaDiLavoro apreUnitaDiLavoro() {
-            return null;
+        public Optional<ProdottoCatalogo> vocePerProdotto(Long prodottoId) {
+            return voce.getProdotto().getId().equals(prodottoId) ? Optional.of(voce) : Optional.empty();
+        }
+
+        @Override
+        public List<ProdottoCatalogo> tutte() {
+            return List.of(voce);
+        }
+
+        @Override
+        public List<ProdottoCatalogo> inOfferta() {
+            return List.of();
+        }
+
+        @Override
+        public List<ProdottoCatalogo> cerca(String termine) {
+            return List.of();
+        }
+
+        @Override
+        public boolean esisteProdottoPerNome(String nome) {
+            return false;
+        }
+
+        @Override
+        public long conta() {
+            return 1;
         }
     }
 }

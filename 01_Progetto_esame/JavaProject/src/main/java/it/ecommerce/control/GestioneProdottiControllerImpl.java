@@ -6,16 +6,12 @@ import it.ecommerce.control.dto.CategoriaDTO;
 import it.ecommerce.control.dto.EsitoDTO;
 import it.ecommerce.control.dto.ProdottoDTO;
 import it.ecommerce.entity.EccezioneValidazione;
-import it.ecommerce.entity.Prodotto;
+import it.ecommerce.entity.ProdottoCatalogo;
 import it.ecommerce.entity.coordinatore.GestoreProdotti;
 
 public class GestioneProdottiControllerImpl implements GestioneProdottiController {
 
     private final GestoreProdotti gestore;
-
-    public GestioneProdottiControllerImpl() {
-        this(new GestoreProdotti());
-    }
 
     public GestioneProdottiControllerImpl(GestoreProdotti gestore) {
         this.gestore = gestore;
@@ -29,7 +25,9 @@ public class GestioneProdottiControllerImpl implements GestioneProdottiControlle
     @Override
     public EsitoDTO<ProdottoDTO> aggiungiProdotto(ProdottoDTO nuovo) {
         try {
-            Prodotto creato = gestore.aggiungi(daDTO(nuovo), nuovo.categoriaId());
+            ProdottoCatalogo creato = gestore.aggiungi(nuovo.nome(), nuovo.descrizione(),
+                    nuovo.prezzoAttuale(), nuovo.quantitaMagazzino(), nuovo.disponibile(),
+                    nuovo.inOfferta(), nuovo.categoriaId());
             return EsitoDTO.successo("Prodotto creato.", MappaProdotti.aDTO(creato));
         } catch (EccezioneValidazione errore) {
             return EsitoDTO.errore(errore.getMessage());
@@ -38,14 +36,16 @@ public class GestioneProdottiControllerImpl implements GestioneProdottiControlle
 
     @Override
     public ProdottoDTO dettaglioProdotto(Long prodottoId) {
-        Prodotto prodotto = gestore.dettaglio(prodottoId);
-        return prodotto == null ? null : MappaProdotti.aDTO(prodotto);
+        ProdottoCatalogo voce = gestore.dettaglio(prodottoId);
+        return voce == null ? null : MappaProdotti.aDTO(voce);
     }
 
     @Override
     public EsitoDTO<ProdottoDTO> modificaProdotto(ProdottoDTO modificato) {
         try {
-            Prodotto aggiornato = gestore.modifica(modificato.id(), daDTO(modificato), modificato.categoriaId());
+            ProdottoCatalogo aggiornato = gestore.modifica(modificato.id(), modificato.nome(),
+                    modificato.descrizione(), modificato.prezzoAttuale(), modificato.quantitaMagazzino(),
+                    modificato.disponibile(), modificato.inOfferta(), modificato.categoriaId());
             return EsitoDTO.successo("Prodotto aggiornato.", MappaProdotti.aDTO(aggiornato));
         } catch (EccezioneValidazione errore) {
             return EsitoDTO.errore(errore.getMessage());
@@ -67,10 +67,5 @@ public class GestioneProdottiControllerImpl implements GestioneProdottiControlle
         return gestore.categorie().stream()
                 .map(categoria -> new CategoriaDTO(categoria.getId(), categoria.getNome()))
                 .toList();
-    }
-
-    private Prodotto daDTO(ProdottoDTO dto) {
-        return new Prodotto(dto.nome(), dto.descrizione(), dto.prezzoAttuale(),
-                dto.quantitaMagazzino(), dto.disponibile(), dto.inOfferta());
     }
 }

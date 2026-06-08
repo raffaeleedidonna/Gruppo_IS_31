@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 
 @Entity
@@ -15,26 +16,33 @@ public class Profilo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
-    private String datiAnagrafici;
+    @Column(nullable = false)
+    private String nome;
+
+    @Column(nullable = false)
+    private String cognome;
 
     @Column
     private String indirizzoSpedizionePrincipale;
 
-    @Column
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String immagineProfilo;
 
-    public Profilo() {
+    protected Profilo() {
     }
 
-    public Profilo(String datiAnagrafici, String indirizzoSpedizionePrincipale, String immagineProfilo) {
-        this.datiAnagrafici = datiAnagrafici;
+    public Profilo(String nome, String cognome, String indirizzoSpedizionePrincipale, String immagineProfilo) {
+        this.nome = nome;
+        this.cognome = cognome;
         this.indirizzoSpedizionePrincipale = indirizzoSpedizionePrincipale;
         this.immagineProfilo = immagineProfilo;
     }
 
-    public void aggiorna(String datiAnagrafici, String indirizzoSpedizionePrincipale, String immagineProfilo) {
-        this.datiAnagrafici = datiAnagrafici;
+    public void aggiorna(String nome, String cognome, String indirizzoSpedizionePrincipale,
+                         String immagineProfilo) {
+        this.nome = nome;
+        this.cognome = cognome;
         this.indirizzoSpedizionePrincipale = indirizzoSpedizionePrincipale;
         this.immagineProfilo = immagineProfilo;
     }
@@ -43,8 +51,12 @@ public class Profilo {
         return id;
     }
 
-    public String getDatiAnagrafici() {
-        return datiAnagrafici;
+    public String getNome() {
+        return nome;
+    }
+
+    public String getCognome() {
+        return cognome;
     }
 
     public String getIndirizzoSpedizionePrincipale() {

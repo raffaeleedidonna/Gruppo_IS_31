@@ -13,10 +13,6 @@ public class GestioneOrdiniControllerImpl implements GestioneOrdiniController {
 
     private final GestoreOrdini gestore;
 
-    public GestioneOrdiniControllerImpl() {
-        this(new GestoreOrdini());
-    }
-
     public GestioneOrdiniControllerImpl(GestoreOrdini gestore) {
         this.gestore = gestore;
     }

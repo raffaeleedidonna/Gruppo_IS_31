@@ -25,6 +25,9 @@ public class RegistrazioneView extends JDialog {
     private final JTextField campoCognome = new JTextField(18);
     private final JTextField campoEmail = new JTextField(18);
     private final JPasswordField campoPassword = new JPasswordField(18);
+    private final JTextField campoIndirizzo = new JTextField(18);
+    private final JLabel etichettaFoto = new JLabel("Nessuna foto selezionata");
+    private String immagineBase64;
 
     public RegistrazioneView(Window proprietario, AutenticazioneController autenticazione) {
         super(proprietario, "Registrazione", ModalityType.APPLICATION_MODAL);
@@ -44,6 +47,12 @@ public class RegistrazioneView extends JDialog {
         campi.add(campoEmail);
         campi.add(new JLabel("Password"));
         campi.add(campoPassword);
+        campi.add(new JLabel("Indirizzo di spedizione"));
+        campi.add(campoIndirizzo);
+        JButton scegliFoto = new JButton("Scegli foto…");
+        scegliFoto.addActionListener(evento -> scegliFoto());
+        campi.add(scegliFoto);
+        campi.add(etichettaFoto);
 
         JButton registrati = new JButton("Registrati");
         JButton annulla = new JButton("Annulla");
@@ -60,12 +69,22 @@ public class RegistrazioneView extends JDialog {
         return contenuto;
     }
 
+    private void scegliFoto() {
+        String base64 = SupportoImmagine.selezionaBase64(this);
+        if (base64 != null) {
+            immagineBase64 = base64;
+            etichettaFoto.setText("Foto selezionata");
+        }
+    }
+
     private void registra() {
         RegistrazioneDTO dati = new RegistrazioneDTO(
                 campoNome.getText().trim(),
                 campoCognome.getText().trim(),
                 campoEmail.getText().trim(),
-                new String(campoPassword.getPassword()));
+                new String(campoPassword.getPassword()),
+                testo(campoIndirizzo),
+                immagineBase64);
         EsitoDTO<UtenteDTO> esito = autenticazione.registra(dati);
         if (esito.successo()) {
             JOptionPane.showMessageDialog(this, esito.messaggio(), "Registrazione",
@@ -75,5 +94,10 @@ public class RegistrazioneView extends JDialog {
             JOptionPane.showMessageDialog(this, esito.messaggio(), "Registrazione non riuscita",
                     JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private String testo(JTextField campo) {
+        String testo = campo.getText().trim();
+        return testo.isEmpty() ? null : testo;
     }
 }

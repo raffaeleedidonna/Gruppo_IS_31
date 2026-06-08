@@ -1,84 +1,83 @@
 package it.ecommerce.entity.coordinatore;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import it.ecommerce.entity.Categoria;
 import it.ecommerce.entity.EccezioneValidazione;
 import it.ecommerce.entity.Prodotto;
-import it.ecommerce.entity.persistenza.FornitorePersistenza;
-import it.ecommerce.entity.persistenza.ProdottoDAO;
-import it.ecommerce.entity.persistenza.RegistroPersistenza;
+import it.ecommerce.entity.ProdottoCatalogo;
+import it.ecommerce.entity.persistenza.CatalogoRepository;
+import it.ecommerce.entity.persistenza.CategoriaRepository;
+import it.ecommerce.entity.persistenza.GestoreTransazioni;
 
 public class GestoreProdotti {
 
-    private final FornitorePersistenza fornitore;
+    private final GestoreTransazioni transazioni;
+    private final CatalogoRepository catalogo;
+    private final CategoriaRepository categorie;
 
-    public GestoreProdotti() {
-        this(RegistroPersistenza.fornitore());
+    public GestoreProdotti(GestoreTransazioni transazioni, CatalogoRepository catalogo,
+                           CategoriaRepository categorie) {
+        this.transazioni = transazioni;
+        this.catalogo = catalogo;
+        this.categorie = categorie;
     }
 
-    public GestoreProdotti(FornitorePersistenza fornitore) {
-        this.fornitore = fornitore;
-    }
-
-    public Prodotto aggiungi(Prodotto nuovo, Long categoriaId) {
-        return fornitore.inTransazione(() -> {
-            ProdottoDAO prodotti = fornitore.prodottoDAO();
-            if (prodotti.esistePerNome(nuovo.getNome())) {
+    public ProdottoCatalogo aggiungi(String nome, String descrizione, BigDecimal prezzoAttuale,
+                                     int quantitaMagazzino, boolean disponibile, boolean inOfferta,
+                                     Long categoriaId) {
+        return transazioni.inTransazione(() -> {
+            if (catalogo.esisteProdottoPerNome(nome)) {
                 throw new EccezioneValidazione("Esiste già un prodotto con questo nome.");
             }
-            validaQuantita(nuovo.getQuantitaMagazzino());
-            nuovo.setCategoria(categoriaValida(categoriaId));
-            return prodotti.salva(nuovo);
+            validaQuantita(quantitaMagazzino);
+            Prodotto prodotto = new Prodotto(nome, descrizione, categoriaValida(categoriaId));
+            ProdottoCatalogo voce = new ProdottoCatalogo(prodotto, prezzoAttuale,
+                    quantitaMagazzino, disponibile, inOfferta);
+            return catalogo.salva(voce);
         });
     }
 
-    public Prodotto modifica(Long id, Prodotto modifiche, Long categoriaId) {
-        return fornitore.inTransazione(() -> {
-            ProdottoDAO prodotti = fornitore.prodottoDAO();
-            Prodotto esistente = prodotti.perId(id)
+    public ProdottoCatalogo modifica(Long prodottoId, String nome, String descrizione, BigDecimal prezzoAttuale,
+                                     int quantitaMagazzino, boolean disponibile, boolean inOfferta,
+                                     Long categoriaId) {
+        return transazioni.inTransazione(() -> {
+            ProdottoCatalogo voce = catalogo.vocePerProdotto(prodottoId)
                     .orElseThrow(() -> new EccezioneValidazione("Prodotto non trovato."));
-            validaQuantita(modifiche.getQuantitaMagazzino());
-            esistente.aggiorna(
-                    modifiche.getNome(),
-                    modifiche.getDescrizione(),
-                    modifiche.getPrezzoAttuale(),
-                    modifiche.getQuantitaMagazzino(),
-                    modifiche.isDisponibile(),
-                    modifiche.isInOfferta(),
-                    categoriaValida(categoriaId));
-            return prodotti.salva(esistente);
+            validaQuantita(quantitaMagazzino);
+            voce.getProdotto().aggiorna(nome, descrizione, categoriaValida(categoriaId));
+            voce.aggiorna(prezzoAttuale, quantitaMagazzino, disponibile, inOfferta);
+            return catalogo.salva(voce);
         });
     }
 
-    public void rimuoviDalCatalogo(Long id) {
-        fornitore.inTransazione(() -> {
-            ProdottoDAO prodotti = fornitore.prodottoDAO();
-            Prodotto esistente = prodotti.perId(id)
+    public void rimuoviDalCatalogo(Long prodottoId) {
+        transazioni.inTransazione(() -> {
+            ProdottoCatalogo voce = catalogo.vocePerProdotto(prodottoId)
                     .orElseThrow(() -> new EccezioneValidazione("Prodotto non trovato."));
-            esistente.rimuoviDalCatalogo();
-            prodotti.salva(esistente);
+            catalogo.rimuovi(voce);
             return null;
         });
     }
 
-    public Prodotto dettaglio(Long id) {
-        return fornitore.inTransazione(() -> fornitore.prodottoDAO().perId(id).orElse(null));
+    public ProdottoCatalogo dettaglio(Long prodottoId) {
+        return transazioni.inTransazione(() -> catalogo.vocePerProdotto(prodottoId).orElse(null));
     }
 
-    public List<Prodotto> tuttiNelCatalogo() {
-        return fornitore.inTransazione(() -> fornitore.prodottoDAO().tuttiNelCatalogo());
+    public List<ProdottoCatalogo> tuttiNelCatalogo() {
+        return transazioni.inTransazione(catalogo::tutte);
     }
 
     public List<Categoria> categorie() {
-        return fornitore.inTransazione(() -> fornitore.categoriaDAO().tutte());
+        return transazioni.inTransazione(categorie::tutte);
     }
 
     private Categoria categoriaValida(Long categoriaId) {
         if (categoriaId == null) {
             throw new EccezioneValidazione("Categoria non valida.");
         }
-        return fornitore.categoriaDAO().perId(categoriaId)
+        return categorie.perId(categoriaId)
                 .orElseThrow(() -> new EccezioneValidazione("Categoria non valida."));
     }
 

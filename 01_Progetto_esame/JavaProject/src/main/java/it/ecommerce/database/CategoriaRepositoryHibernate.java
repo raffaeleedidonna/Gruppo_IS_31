@@ -7,13 +7,13 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import it.ecommerce.entity.Categoria;
-import it.ecommerce.entity.persistenza.CategoriaDAO;
+import it.ecommerce.entity.persistenza.CategoriaRepository;
 
-final class CategoriaDAOHibernate implements CategoriaDAO {
+final class CategoriaRepositoryHibernate implements CategoriaRepository {
 
     private final SessionFactory sessionFactory;
 
-    CategoriaDAOHibernate(SessionFactory sessionFactory) {
+    CategoriaRepositoryHibernate(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 

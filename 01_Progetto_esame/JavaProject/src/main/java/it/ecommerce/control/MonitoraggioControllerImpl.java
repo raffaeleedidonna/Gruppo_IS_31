@@ -14,10 +14,6 @@ public class MonitoraggioControllerImpl implements MonitoraggioController {
 
     private final GestoreMonitoraggio gestore;
 
-    public MonitoraggioControllerImpl() {
-        this(new GestoreMonitoraggio());
-    }
-
     public MonitoraggioControllerImpl(GestoreMonitoraggio gestore) {
         this.gestore = gestore;
     }

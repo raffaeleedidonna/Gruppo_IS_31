@@ -3,6 +3,7 @@ package it.ecommerce.control;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
@@ -13,43 +14,50 @@ import org.junit.jupiter.api.Test;
 
 import it.ecommerce.control.dto.EsitoDTO;
 import it.ecommerce.control.dto.OrdineDTO;
+import it.ecommerce.entity.Categoria;
 import it.ecommerce.entity.Cliente;
 import it.ecommerce.entity.Notifica;
 import it.ecommerce.entity.Ordine;
 import it.ecommerce.entity.Prodotto;
+import it.ecommerce.entity.ProdottoCatalogo;
 import it.ecommerce.entity.Profilo;
 import it.ecommerce.entity.StatoOrdine;
 import it.ecommerce.entity.Utente;
 import it.ecommerce.entity.coordinatore.GestoreOrdiniCliente;
-import it.ecommerce.entity.persistenza.AzioneTransazionale;
-import it.ecommerce.entity.persistenza.CategoriaDAO;
-import it.ecommerce.entity.persistenza.FornitorePersistenza;
-import it.ecommerce.entity.persistenza.NotificaDAO;
-import it.ecommerce.entity.persistenza.OrdineDAO;
-import it.ecommerce.entity.persistenza.ProdottoDAO;
-import it.ecommerce.entity.persistenza.UnitaDiLavoro;
-import it.ecommerce.entity.persistenza.UtenteDAO;
+import it.ecommerce.entity.persistenza.CatalogoRepository;
+import it.ecommerce.entity.persistenza.NotificaRepository;
+import it.ecommerce.entity.persistenza.OrdineRepository;
+import it.ecommerce.entity.persistenza.UtenteRepository;
 
 class OrdineClienteControllerImplTest {
 
-    private OrdineClienteController controllerCon(FornitoreOrdiniFinto fornitore) {
-        return new OrdineClienteControllerImpl(new GestoreOrdiniCliente(fornitore));
+    private ProdottoCatalogo voce(Long prodottoId, BigDecimal prezzo, int magazzino, boolean disponibile) {
+        Prodotto prodotto = new Prodotto("Penna", "", new Categoria("Cancelleria"));
+        SupportoTest.assegnaId(prodotto, prodottoId);
+        return new ProdottoCatalogo(prodotto, prezzo, magazzino, disponibile, false);
+    }
+
+    private OrdineClienteController controllerCon(UtenteFinto utenti, OrdineFinto ordini,
+                                                 NotificaFinto notifiche, CatalogoFinto catalogoRepo) {
+        return new OrdineClienteControllerImpl(new GestoreOrdiniCliente(
+                new TransazioniDirette(), utenti, ordini, notifiche, catalogoRepo));
     }
 
     @Test
     void confermaOrdineDecrementaStockSvuotaCarrelloEFissaPrezzo() {
-        Prodotto prodotto = new Prodotto("Penna", "", new BigDecimal("2.50"), 10, true, false);
-        Cliente cliente = new Cliente("c@x.it", "pw", "Mario", "Rossi", new Profilo());
-        cliente.carrelloCorrente().aggiungi(prodotto, 4);
-        FornitoreOrdiniFinto fornitore = new FornitoreOrdiniFinto(cliente);
+        ProdottoCatalogo voce = voce(1L, new BigDecimal("2.50"), 10, true);
+        Cliente cliente = new Cliente("c@x.it", "pw", new Profilo("Mario", "Rossi", null, null));
+        cliente.carrelloCorrente().aggiungi(voce.getProdotto(), 4);
+        OrdineFinto ordini = new OrdineFinto();
 
-        EsitoDTO<OrdineDTO> esito = controllerCon(fornitore).confermaOrdine(1L, "Via Test 1");
+        EsitoDTO<OrdineDTO> esito = controllerCon(new UtenteFinto(cliente), ordini,
+                new NotificaFinto(), new CatalogoFinto(voce)).confermaOrdine(1L, "Via Test 1");
 
         assertTrue(esito.successo());
-        assertEquals(6, prodotto.getQuantitaMagazzino());
+        assertEquals(6, voce.getQuantitaMagazzino());
         assertTrue(cliente.getCarrello().isVuoto());
 
-        Ordine salvato = fornitore.ordineSalvato();
+        Ordine salvato = ordini.ordineSalvato();
         assertEquals(1, salvato.getRighe().size());
         assertEquals(4, salvato.getRighe().get(0).getQuantitaAcquistata());
         assertEquals(0, new BigDecimal("2.50").compareTo(salvato.getRighe().get(0).getPrezzoDiAcquisto()));
@@ -58,133 +66,180 @@ class OrdineClienteControllerImplTest {
     }
 
     @Test
-    void confermaOrdineConDisponibilitaInsufficienteAdeguaIlCarrello() {
-        Prodotto prodotto = new Prodotto("Penna", "", new BigDecimal("2.50"), 2, true, false);
-        Cliente cliente = new Cliente("c@x.it", "pw", "Mario", "Rossi", new Profilo());
-        cliente.carrelloCorrente().aggiungi(prodotto, 5);
-        FornitoreOrdiniFinto fornitore = new FornitoreOrdiniFinto(cliente);
+    void confermaOrdineGeneraNotificaAssociataAllOrdine() {
+        ProdottoCatalogo voce = voce(1L, new BigDecimal("2.50"), 10, true);
+        Cliente cliente = new Cliente("c@x.it", "pw", new Profilo("Mario", "Rossi", null, null));
+        cliente.carrelloCorrente().aggiungi(voce.getProdotto(), 2);
+        OrdineFinto ordini = new OrdineFinto();
+        NotificaFinto notifiche = new NotificaFinto();
 
-        EsitoDTO<OrdineDTO> esito = controllerCon(fornitore).confermaOrdine(1L, null);
+        controllerCon(new UtenteFinto(cliente), ordini, notifiche, new CatalogoFinto(voce))
+                .confermaOrdine(1L, "Via Test 1");
+
+        Notifica notifica = notifiche.notificaSalvata();
+        assertSame(ordini.ordineSalvato(), notifica.getOrdine());
+        assertSame(cliente, notifica.getCliente());
+        assertFalse(notifica.isLetta());
+    }
+
+    @Test
+    void confermaOrdineConDisponibilitaInsufficienteAdeguaIlCarrello() {
+        ProdottoCatalogo voce = voce(1L, new BigDecimal("2.50"), 2, true);
+        Cliente cliente = new Cliente("c@x.it", "pw", new Profilo("Mario", "Rossi", null, null));
+        cliente.carrelloCorrente().aggiungi(voce.getProdotto(), 5);
+        OrdineFinto ordini = new OrdineFinto();
+
+        EsitoDTO<OrdineDTO> esito = controllerCon(new UtenteFinto(cliente), ordini,
+                new NotificaFinto(), new CatalogoFinto(voce)).confermaOrdine(1L, null);
 
         assertFalse(esito.successo());
-        assertNull(fornitore.ordineSalvato());
+        assertNull(ordini.ordineSalvato());
         assertEquals(2, cliente.getCarrello().getRighe().get(0).getQuantita());
-        assertEquals(2, prodotto.getQuantitaMagazzino());
+        assertEquals(2, voce.getQuantitaMagazzino());
     }
 
     @Test
     void confermaOrdineConCarrelloVuotoFallisce() {
-        Cliente cliente = new Cliente("c@x.it", "pw", "Mario", "Rossi", new Profilo());
-        FornitoreOrdiniFinto fornitore = new FornitoreOrdiniFinto(cliente);
+        ProdottoCatalogo voce = voce(1L, new BigDecimal("2.50"), 10, true);
+        Cliente cliente = new Cliente("c@x.it", "pw", new Profilo("Mario", "Rossi", null, null));
+        OrdineFinto ordini = new OrdineFinto();
 
-        EsitoDTO<OrdineDTO> esito = controllerCon(fornitore).confermaOrdine(1L, null);
+        EsitoDTO<OrdineDTO> esito = controllerCon(new UtenteFinto(cliente), ordini,
+                new NotificaFinto(), new CatalogoFinto(voce)).confermaOrdine(1L, null);
 
         assertFalse(esito.successo());
-        assertNull(fornitore.ordineSalvato());
+        assertNull(ordini.ordineSalvato());
     }
 
-    private static final class FornitoreOrdiniFinto implements FornitorePersistenza {
+    private static final class UtenteFinto implements UtenteRepository {
 
         private final Cliente cliente;
-        private Ordine ordineSalvato;
 
-        FornitoreOrdiniFinto(Cliente cliente) {
+        UtenteFinto(Cliente cliente) {
             this.cliente = cliente;
         }
+
+        @Override
+        public Utente salva(Utente utente) {
+            return utente;
+        }
+
+        @Override
+        public Optional<Utente> perEmail(String email) {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<Utente> perId(Long id) {
+            return Optional.of(cliente);
+        }
+
+        @Override
+        public boolean esisteEmail(String email) {
+            return false;
+        }
+
+        @Override
+        public long contaClienti() {
+            return 1;
+        }
+    }
+
+    private static final class OrdineFinto implements OrdineRepository {
+
+        private Ordine ordineSalvato;
 
         Ordine ordineSalvato() {
             return ordineSalvato;
         }
 
         @Override
-        public <R> R inTransazione(AzioneTransazionale<R> azione) {
-            return azione.esegui();
+        public Ordine salva(Ordine ordine) {
+            ordineSalvato = ordine;
+            return ordine;
         }
 
         @Override
-        public UtenteDAO utenteDAO() {
-            return new UtenteDAO() {
-                @Override
-                public Utente salva(Utente utente) {
-                    return utente;
-                }
-
-                @Override
-                public Optional<Utente> perEmail(String email) {
-                    return Optional.empty();
-                }
-
-                @Override
-                public Optional<Utente> perId(Long id) {
-                    return Optional.of(cliente);
-                }
-
-                @Override
-                public boolean esisteEmail(String email) {
-                    return false;
-                }
-
-                @Override
-                public long contaClienti() {
-                    return 1;
-                }
-            };
+        public Optional<Ordine> perId(Long id) {
+            return Optional.ofNullable(ordineSalvato);
         }
 
         @Override
-        public OrdineDAO ordineDAO() {
-            return new OrdineDAO() {
-                @Override
-                public Ordine salva(Ordine ordine) {
-                    ordineSalvato = ordine;
-                    return ordine;
-                }
-
-                @Override
-                public Optional<Ordine> perId(Long id) {
-                    return Optional.empty();
-                }
-
-                @Override
-                public List<Ordine> tutti() {
-                    return List.of();
-                }
-
-                @Override
-                public List<Ordine> perCliente(Long clienteId) {
-                    return List.of();
-                }
-            };
+        public List<Ordine> tutti() {
+            return List.of();
         }
 
         @Override
-        public NotificaDAO notificaDAO() {
-            return new NotificaDAO() {
-                @Override
-                public Notifica salva(Notifica notifica) {
-                    return notifica;
-                }
+        public List<Ordine> perCliente(Long clienteId) {
+            return List.of();
+        }
+    }
 
-                @Override
-                public List<Notifica> perCliente(Long clienteId) {
-                    return List.of();
-                }
-            };
+    private static final class NotificaFinto implements NotificaRepository {
+
+        private Notifica notificaSalvata;
+
+        Notifica notificaSalvata() {
+            return notificaSalvata;
         }
 
         @Override
-        public ProdottoDAO prodottoDAO() {
-            return null;
+        public Notifica salva(Notifica notifica) {
+            notificaSalvata = notifica;
+            return notifica;
         }
 
         @Override
-        public CategoriaDAO categoriaDAO() {
-            return null;
+        public List<Notifica> perCliente(Long clienteId) {
+            return List.of();
+        }
+    }
+
+    private static final class CatalogoFinto implements CatalogoRepository {
+
+        private final ProdottoCatalogo voce;
+
+        CatalogoFinto(ProdottoCatalogo voce) {
+            this.voce = voce;
         }
 
         @Override
-        public UnitaDiLavoro apreUnitaDiLavoro() {
-            return null;
+        public ProdottoCatalogo salva(ProdottoCatalogo voceDaSalvare) {
+            return voceDaSalvare;
+        }
+
+        @Override
+        public void rimuovi(ProdottoCatalogo voceDaRimuovere) {
+        }
+
+        @Override
+        public Optional<ProdottoCatalogo> vocePerProdotto(Long prodottoId) {
+            return voce.getProdotto().getId().equals(prodottoId) ? Optional.of(voce) : Optional.empty();
+        }
+
+        @Override
+        public List<ProdottoCatalogo> tutte() {
+            return List.of(voce);
+        }
+
+        @Override
+        public List<ProdottoCatalogo> inOfferta() {
+            return List.of();
+        }
+
+        @Override
+        public List<ProdottoCatalogo> cerca(String termine) {
+            return List.of();
+        }
+
+        @Override
+        public boolean esisteProdottoPerNome(String nome) {
+            return false;
+        }
+
+        @Override
+        public long conta() {
+            return 1;
         }
     }
 }

@@ -25,17 +25,30 @@ public class Notifica {
     @Column(nullable = false)
     private LocalDateTime dataCreazione;
 
+    @Column(nullable = false)
+    private boolean letta;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
+    @ManyToOne
+    @JoinColumn(name = "ordine_id")
+    private Ordine ordine;
+
     protected Notifica() {
     }
 
-    public Notifica(Cliente cliente, String messaggio) {
+    public Notifica(Cliente cliente, String messaggio, Ordine ordine) {
         this.cliente = cliente;
         this.messaggio = messaggio;
+        this.ordine = ordine;
         this.dataCreazione = LocalDateTime.now();
+        this.letta = false;
+    }
+
+    public void segnaLetta() {
+        this.letta = true;
     }
 
     public Long getId() {
@@ -48,5 +61,17 @@ public class Notifica {
 
     public LocalDateTime getDataCreazione() {
         return dataCreazione;
+    }
+
+    public boolean isLetta() {
+        return letta;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public Ordine getOrdine() {
+        return ordine;
     }
 }

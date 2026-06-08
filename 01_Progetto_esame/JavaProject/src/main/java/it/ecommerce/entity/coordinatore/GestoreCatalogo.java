@@ -2,31 +2,29 @@ package it.ecommerce.entity.coordinatore;
 
 import java.util.List;
 
-import it.ecommerce.entity.Prodotto;
-import it.ecommerce.entity.persistenza.FornitorePersistenza;
-import it.ecommerce.entity.persistenza.RegistroPersistenza;
+import it.ecommerce.entity.ProdottoCatalogo;
+import it.ecommerce.entity.persistenza.CatalogoRepository;
+import it.ecommerce.entity.persistenza.GestoreTransazioni;
 
 public class GestoreCatalogo {
 
-    private final FornitorePersistenza fornitore;
+    private final GestoreTransazioni transazioni;
+    private final CatalogoRepository catalogo;
 
-    public GestoreCatalogo() {
-        this(RegistroPersistenza.fornitore());
+    public GestoreCatalogo(GestoreTransazioni transazioni, CatalogoRepository catalogo) {
+        this.transazioni = transazioni;
+        this.catalogo = catalogo;
     }
 
-    public GestoreCatalogo(FornitorePersistenza fornitore) {
-        this.fornitore = fornitore;
+    public List<ProdottoCatalogo> consultaCatalogo() {
+        return transazioni.inTransazione(catalogo::tutte);
     }
 
-    public List<Prodotto> consultaCatalogo() {
-        return fornitore.inTransazione(() -> fornitore.prodottoDAO().tuttiNelCatalogo());
+    public List<ProdottoCatalogo> offerte() {
+        return transazioni.inTransazione(catalogo::inOfferta);
     }
 
-    public List<Prodotto> offerte() {
-        return fornitore.inTransazione(() -> fornitore.prodottoDAO().inOfferta());
-    }
-
-    public List<Prodotto> cerca(String termine) {
-        return fornitore.inTransazione(() -> fornitore.prodottoDAO().cerca(termine));
+    public List<ProdottoCatalogo> cerca(String termine) {
+        return transazioni.inTransazione(() -> catalogo.cerca(termine));
     }
 }
