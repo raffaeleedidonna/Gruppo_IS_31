@@ -6,9 +6,9 @@ import it.ecommerce.entity.persistenza.CatalogoRepository;
 import it.ecommerce.entity.persistenza.CategoriaRepository;
 import it.ecommerce.entity.persistenza.FornitorePersistenza;
 import it.ecommerce.entity.persistenza.GestoreTransazioni;
-import it.ecommerce.entity.persistenza.NotificaRepository;
 import it.ecommerce.entity.persistenza.OrdineRepository;
 import it.ecommerce.entity.persistenza.UtenteRepository;
+import it.ecommerce.entity.servizi.ServizioNotifiche;
 
 public final class FornitorePersistenzaHibernate implements FornitorePersistenza {
 
@@ -17,7 +17,7 @@ public final class FornitorePersistenzaHibernate implements FornitorePersistenza
     private final CategoriaRepository categoriaRepository;
     private final UtenteRepository utenteRepository;
     private final OrdineRepository ordineRepository;
-    private final NotificaRepository notificaRepository;
+    private final ServizioNotifiche servizioNotifiche;
 
     public FornitorePersistenzaHibernate() {
         SessionFactory sessionFactory = SessionFactoryProvider.sessionFactory();
@@ -26,7 +26,7 @@ public final class FornitorePersistenzaHibernate implements FornitorePersistenza
         this.categoriaRepository = new CategoriaRepositoryHibernate(sessionFactory);
         this.utenteRepository = new UtenteRepositoryHibernate(sessionFactory);
         this.ordineRepository = new OrdineRepositoryHibernate(sessionFactory);
-        this.notificaRepository = new NotificaRepositoryHibernate(sessionFactory);
+        this.servizioNotifiche = new ServizioNotificheLog();
         SeedSviluppo.popolaSeNecessario(this);
     }
 
@@ -56,7 +56,7 @@ public final class FornitorePersistenzaHibernate implements FornitorePersistenza
     }
 
     @Override
-    public NotificaRepository notificaRepository() {
-        return notificaRepository;
+    public ServizioNotifiche servizioNotifiche() {
+        return servizioNotifiche;
     }
 }

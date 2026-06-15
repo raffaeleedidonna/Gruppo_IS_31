@@ -6,7 +6,6 @@ import java.util.List;
 import it.ecommerce.entity.Carrello;
 import it.ecommerce.entity.Cliente;
 import it.ecommerce.entity.EccezioneValidazione;
-import it.ecommerce.entity.Notifica;
 import it.ecommerce.entity.Ordine;
 import it.ecommerce.entity.Prodotto;
 import it.ecommerce.entity.ProdottoCatalogo;
@@ -15,20 +14,21 @@ import it.ecommerce.entity.RigaCarrello;
 import it.ecommerce.entity.Utente;
 import it.ecommerce.entity.persistenza.CatalogoRepository;
 import it.ecommerce.entity.persistenza.GestoreTransazioni;
-import it.ecommerce.entity.persistenza.NotificaRepository;
 import it.ecommerce.entity.persistenza.OrdineRepository;
 import it.ecommerce.entity.persistenza.UtenteRepository;
+import it.ecommerce.entity.servizi.MessaggioNotifica;
+import it.ecommerce.entity.servizi.ServizioNotifiche;
 
 public class GestoreOrdiniCliente {
 
     private final GestoreTransazioni transazioni;
     private final UtenteRepository utenti;
     private final OrdineRepository ordini;
-    private final NotificaRepository notifiche;
+    private final ServizioNotifiche notifiche;
     private final CatalogoRepository catalogo;
 
     public GestoreOrdiniCliente(GestoreTransazioni transazioni, UtenteRepository utenti,
-                                OrdineRepository ordini, NotificaRepository notifiche,
+                                OrdineRepository ordini, ServizioNotifiche notifiche,
                                 CatalogoRepository catalogo) {
         this.transazioni = transazioni;
         this.utenti = utenti;
@@ -38,7 +38,8 @@ public class GestoreOrdiniCliente {
     }
 
     public EsitoConfermaOrdine confermaOrdine(Long clienteId, String indirizzoRichiesto) {
-        return transazioni.inTransazione(() -> {
+        MessaggioNotifica[] notificaDaInviare = {null};
+        EsitoConfermaOrdine esito = transazioni.inTransazione(() -> {
             Cliente cliente = clienteValido(clienteId);
             Carrello carrello = cliente.getCarrello();
             if (carrello == null || carrello.isVuoto()) {
@@ -59,14 +60,18 @@ public class GestoreOrdiniCliente {
             }
             ordine.assicuraNonVuoto();
             Ordine salvato = ordini.salva(ordine);
-            notifiche.salva(new Notifica(cliente,
-                    "Ordine " + salvato.getId() + " confermato con successo.", salvato));
+            notificaDaInviare[0] = new MessaggioNotifica(cliente.getEmail(),
+                    "Ordine " + salvato.getId() + " confermato con successo.");
             carrello.svuota();
             utenti.salva(cliente);
             inizializza(salvato);
             return new EsitoConfermaOrdine(true,
                     "Ordine creato con successo. Identificativo: " + salvato.getId() + ".", salvato);
         });
+        if (notificaDaInviare[0] != null) {
+            notifiche.invia(notificaDaInviare[0]);
+        }
+        return esito;
     }
 
     public List<Ordine> storicoOrdini(Long clienteId) {

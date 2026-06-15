@@ -3,6 +3,7 @@ package it.ecommerce.control;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
@@ -19,15 +20,16 @@ import it.ecommerce.entity.persistenza.UtenteRepository;
 
 class AutenticazioneControllerImplTest {
 
-    private AutenticazioneController controllerCon(UtenteFinto utenti) {
-        return new AutenticazioneControllerImpl(new GestoreAutenticazione(new TransazioniDirette(), utenti));
+    private AutenticazioneController controllerCon(UtenteFinto utenti, ServizioNotificheFinto notifiche) {
+        return new AutenticazioneControllerImpl(
+                new GestoreAutenticazione(new TransazioniDirette(), utenti, notifiche));
     }
 
     @Test
     void registrazioneCreaClienteConProfiloPopolato() {
         UtenteFinto utenti = new UtenteFinto(false);
-        EsitoDTO<UtenteDTO> esito = controllerCon(utenti).registra(new RegistrazioneDTO(
-                "Mario", "Rossi", "mario@x.it", "pw", "Via Roma 1", "Zm90bw=="));
+        EsitoDTO<UtenteDTO> esito = controllerCon(utenti, new ServizioNotificheFinto()).registra(
+                new RegistrazioneDTO("Mario", "Rossi", "mario@x.it", "pw", "Via Roma 1", "Zm90bw=="));
 
         assertTrue(esito.successo());
         Cliente cliente = assertInstanceOf(Cliente.class, utenti.salvato());
@@ -40,13 +42,25 @@ class AutenticazioneControllerImplTest {
     }
 
     @Test
+    void registrazioneInviaNotificaDiBenvenuto() {
+        ServizioNotificheFinto notifiche = new ServizioNotificheFinto();
+        controllerCon(new UtenteFinto(false), notifiche).registra(new RegistrazioneDTO(
+                "Mario", "Rossi", "mario@x.it", "pw", null, null));
+
+        assertEquals("mario@x.it", notifiche.ultimo().destinatario());
+        assertTrue(notifiche.ultimo().testo().toLowerCase().contains("benvenuto"));
+    }
+
+    @Test
     void registrazioneConEmailDuplicataFallisce() {
         UtenteFinto utenti = new UtenteFinto(true);
-        EsitoDTO<UtenteDTO> esito = controllerCon(utenti).registra(new RegistrazioneDTO(
+        ServizioNotificheFinto notifiche = new ServizioNotificheFinto();
+        EsitoDTO<UtenteDTO> esito = controllerCon(utenti, notifiche).registra(new RegistrazioneDTO(
                 "Mario", "Rossi", "mario@x.it", "pw", null, null));
 
         assertFalse(esito.successo());
         assertTrue(esito.messaggio().toLowerCase().contains("email"));
+        assertNull(notifiche.ultimo());
     }
 
     private static final class UtenteFinto implements UtenteRepository {

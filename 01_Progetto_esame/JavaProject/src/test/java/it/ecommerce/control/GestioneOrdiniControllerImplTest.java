@@ -22,6 +22,7 @@ import it.ecommerce.entity.StatoOrdine;
 import it.ecommerce.entity.coordinatore.GestoreOrdini;
 import it.ecommerce.entity.persistenza.CatalogoRepository;
 import it.ecommerce.entity.persistenza.OrdineRepository;
+import it.ecommerce.entity.servizi.MessaggioNotifica;
 
 class GestioneOrdiniControllerImplTest {
 
@@ -37,9 +38,10 @@ class GestioneOrdiniControllerImplTest {
         return ordine;
     }
 
-    private GestioneOrdiniController controllerCon(Ordine ordine, ProdottoCatalogo voce) {
+    private GestioneOrdiniController controllerCon(Ordine ordine, ProdottoCatalogo voce,
+                                                  ServizioNotificheFinto notifiche) {
         return new GestioneOrdiniControllerImpl(new GestoreOrdini(
-                new TransazioniDirette(), new OrdineFinto(ordine), new CatalogoFinto(voce)));
+                new TransazioniDirette(), new OrdineFinto(ordine), new CatalogoFinto(voce), notifiche));
     }
 
     @Test
@@ -47,7 +49,8 @@ class GestioneOrdiniControllerImplTest {
         ProdottoCatalogo voce = voce(2);
         Ordine ordine = ordineConRiga(voce, 3);
 
-        EsitoDTO<OrdineDTO> esito = controllerCon(ordine, voce).aggiornaStato(10L, StatoOrdineDTO.ANNULLATO);
+        EsitoDTO<OrdineDTO> esito = controllerCon(ordine, voce, new ServizioNotificheFinto())
+                .aggiornaStato(10L, StatoOrdineDTO.ANNULLATO);
 
         assertTrue(esito.successo());
         assertEquals("Ordine annullato con successo", esito.messaggio());
@@ -60,7 +63,8 @@ class GestioneOrdiniControllerImplTest {
         ProdottoCatalogo voce = voce(2);
         Ordine ordine = ordineConRiga(voce, 3);
 
-        EsitoDTO<OrdineDTO> esito = controllerCon(ordine, voce).aggiornaStato(10L, StatoOrdineDTO.SPEDITO);
+        EsitoDTO<OrdineDTO> esito = controllerCon(ordine, voce, new ServizioNotificheFinto())
+                .aggiornaStato(10L, StatoOrdineDTO.SPEDITO);
 
         assertTrue(esito.successo());
         assertEquals(2, voce.getQuantitaMagazzino());
@@ -68,10 +72,23 @@ class GestioneOrdiniControllerImplTest {
     }
 
     @Test
+    void aggiornamentoDiStatoInviaNotificaAlCliente() {
+        ProdottoCatalogo voce = voce(2);
+        Ordine ordine = ordineConRiga(voce, 3);
+        ServizioNotificheFinto notifiche = new ServizioNotificheFinto();
+
+        controllerCon(ordine, voce, notifiche).aggiornaStato(10L, StatoOrdineDTO.SPEDITO);
+
+        MessaggioNotifica notifica = notifiche.ultimo();
+        assertEquals("c@x.it", notifica.destinatario());
+        assertTrue(notifica.testo().contains("aggiornato"));
+    }
+
+    @Test
     void doppioAnnullamentoNonRaddoppiaLoStock() {
         ProdottoCatalogo voce = voce(2);
         Ordine ordine = ordineConRiga(voce, 3);
-        GestioneOrdiniController controller = controllerCon(ordine, voce);
+        GestioneOrdiniController controller = controllerCon(ordine, voce, new ServizioNotificheFinto());
 
         controller.aggiornaStato(10L, StatoOrdineDTO.ANNULLATO);
         controller.aggiornaStato(10L, StatoOrdineDTO.ANNULLATO);

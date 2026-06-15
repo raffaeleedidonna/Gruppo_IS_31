@@ -9,17 +9,22 @@ import it.ecommerce.entity.StatoOrdine;
 import it.ecommerce.entity.persistenza.CatalogoRepository;
 import it.ecommerce.entity.persistenza.GestoreTransazioni;
 import it.ecommerce.entity.persistenza.OrdineRepository;
+import it.ecommerce.entity.servizi.MessaggioNotifica;
+import it.ecommerce.entity.servizi.ServizioNotifiche;
 
 public class GestoreOrdini {
 
     private final GestoreTransazioni transazioni;
     private final OrdineRepository ordini;
     private final CatalogoRepository catalogo;
+    private final ServizioNotifiche notifiche;
 
-    public GestoreOrdini(GestoreTransazioni transazioni, OrdineRepository ordini, CatalogoRepository catalogo) {
+    public GestoreOrdini(GestoreTransazioni transazioni, OrdineRepository ordini,
+                         CatalogoRepository catalogo, ServizioNotifiche notifiche) {
         this.transazioni = transazioni;
         this.ordini = ordini;
         this.catalogo = catalogo;
+        this.notifiche = notifiche;
     }
 
     public List<Ordine> elencoOrdini() {
@@ -34,7 +39,8 @@ public class GestoreOrdini {
     }
 
     public Ordine aggiornaStato(Long ordineId, StatoOrdine nuovoStato) {
-        return transazioni.inTransazione(() -> {
+        MessaggioNotifica[] notificaDaInviare = {null};
+        Ordine aggiornato = transazioni.inTransazione(() -> {
             Ordine ordine = ordini.perId(ordineId)
                     .orElseThrow(() -> new EccezioneValidazione("Ordine non trovato."));
             if (nuovoStato == StatoOrdine.ANNULLATO && ordine.getStato() != StatoOrdine.ANNULLATO) {
@@ -42,8 +48,14 @@ public class GestoreOrdini {
             } else {
                 ordine.cambiaStato(nuovoStato);
             }
-            return inizializza(ordini.salva(ordine));
+            Ordine salvato = inizializza(ordini.salva(ordine));
+            notificaDaInviare[0] = new MessaggioNotifica(salvato.getCliente().getEmail(),
+                    "Lo stato dell'ordine " + salvato.getId() + " è stato aggiornato a "
+                            + salvato.getStato() + ".");
+            return salvato;
         });
+        notifiche.invia(notificaDaInviare[0]);
+        return aggiornato;
     }
 
     private void annulla(Ordine ordine) {

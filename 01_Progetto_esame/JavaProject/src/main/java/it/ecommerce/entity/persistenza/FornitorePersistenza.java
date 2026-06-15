@@ -1,5 +1,7 @@
 package it.ecommerce.entity.persistenza;
 
+import it.ecommerce.entity.servizi.ServizioNotifiche;
+
 public interface FornitorePersistenza {
 
     GestoreTransazioni gestoreTransazioni();
@@ -12,5 +14,5 @@ public interface FornitorePersistenza {
 
     OrdineRepository ordineRepository();
 
-    NotificaRepository notificaRepository();
+    ServizioNotifiche servizioNotifiche();
 }

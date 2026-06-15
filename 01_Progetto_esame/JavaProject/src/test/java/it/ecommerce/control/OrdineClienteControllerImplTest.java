@@ -3,7 +3,6 @@ package it.ecommerce.control;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
@@ -16,7 +15,6 @@ import it.ecommerce.control.dto.EsitoDTO;
 import it.ecommerce.control.dto.OrdineDTO;
 import it.ecommerce.entity.Categoria;
 import it.ecommerce.entity.Cliente;
-import it.ecommerce.entity.Notifica;
 import it.ecommerce.entity.Ordine;
 import it.ecommerce.entity.Prodotto;
 import it.ecommerce.entity.ProdottoCatalogo;
@@ -25,9 +23,9 @@ import it.ecommerce.entity.StatoOrdine;
 import it.ecommerce.entity.Utente;
 import it.ecommerce.entity.coordinatore.GestoreOrdiniCliente;
 import it.ecommerce.entity.persistenza.CatalogoRepository;
-import it.ecommerce.entity.persistenza.NotificaRepository;
 import it.ecommerce.entity.persistenza.OrdineRepository;
 import it.ecommerce.entity.persistenza.UtenteRepository;
+import it.ecommerce.entity.servizi.MessaggioNotifica;
 
 class OrdineClienteControllerImplTest {
 
@@ -38,7 +36,7 @@ class OrdineClienteControllerImplTest {
     }
 
     private OrdineClienteController controllerCon(UtenteFinto utenti, OrdineFinto ordini,
-                                                 NotificaFinto notifiche, CatalogoFinto catalogoRepo) {
+                                                 ServizioNotificheFinto notifiche, CatalogoFinto catalogoRepo) {
         return new OrdineClienteControllerImpl(new GestoreOrdiniCliente(
                 new TransazioniDirette(), utenti, ordini, notifiche, catalogoRepo));
     }
@@ -51,7 +49,7 @@ class OrdineClienteControllerImplTest {
         OrdineFinto ordini = new OrdineFinto();
 
         EsitoDTO<OrdineDTO> esito = controllerCon(new UtenteFinto(cliente), ordini,
-                new NotificaFinto(), new CatalogoFinto(voce)).confermaOrdine(1L, "Via Test 1");
+                new ServizioNotificheFinto(), new CatalogoFinto(voce)).confermaOrdine(1L, "Via Test 1");
 
         assertTrue(esito.successo());
         assertEquals(6, voce.getQuantitaMagazzino());
@@ -66,20 +64,19 @@ class OrdineClienteControllerImplTest {
     }
 
     @Test
-    void confermaOrdineGeneraNotificaAssociataAllOrdine() {
+    void confermaOrdineInviaNotificaAlCliente() {
         ProdottoCatalogo voce = voce(1L, new BigDecimal("2.50"), 10, true);
         Cliente cliente = new Cliente("c@x.it", "pw", new Profilo("Mario", "Rossi", null, null));
         cliente.carrelloCorrente().aggiungi(voce.getProdotto(), 2);
         OrdineFinto ordini = new OrdineFinto();
-        NotificaFinto notifiche = new NotificaFinto();
+        ServizioNotificheFinto notifiche = new ServizioNotificheFinto();
 
         controllerCon(new UtenteFinto(cliente), ordini, notifiche, new CatalogoFinto(voce))
                 .confermaOrdine(1L, "Via Test 1");
 
-        Notifica notifica = notifiche.notificaSalvata();
-        assertSame(ordini.ordineSalvato(), notifica.getOrdine());
-        assertSame(cliente, notifica.getCliente());
-        assertFalse(notifica.isLetta());
+        MessaggioNotifica notifica = notifiche.ultimo();
+        assertEquals("c@x.it", notifica.destinatario());
+        assertTrue(notifica.testo().contains("confermato"));
     }
 
     @Test
@@ -90,7 +87,7 @@ class OrdineClienteControllerImplTest {
         OrdineFinto ordini = new OrdineFinto();
 
         EsitoDTO<OrdineDTO> esito = controllerCon(new UtenteFinto(cliente), ordini,
-                new NotificaFinto(), new CatalogoFinto(voce)).confermaOrdine(1L, null);
+                new ServizioNotificheFinto(), new CatalogoFinto(voce)).confermaOrdine(1L, null);
 
         assertFalse(esito.successo());
         assertNull(ordini.ordineSalvato());
@@ -105,7 +102,7 @@ class OrdineClienteControllerImplTest {
         OrdineFinto ordini = new OrdineFinto();
 
         EsitoDTO<OrdineDTO> esito = controllerCon(new UtenteFinto(cliente), ordini,
-                new NotificaFinto(), new CatalogoFinto(voce)).confermaOrdine(1L, null);
+                new ServizioNotificheFinto(), new CatalogoFinto(voce)).confermaOrdine(1L, null);
 
         assertFalse(esito.successo());
         assertNull(ordini.ordineSalvato());
@@ -171,26 +168,6 @@ class OrdineClienteControllerImplTest {
 
         @Override
         public List<Ordine> perCliente(Long clienteId) {
-            return List.of();
-        }
-    }
-
-    private static final class NotificaFinto implements NotificaRepository {
-
-        private Notifica notificaSalvata;
-
-        Notifica notificaSalvata() {
-            return notificaSalvata;
-        }
-
-        @Override
-        public Notifica salva(Notifica notifica) {
-            notificaSalvata = notifica;
-            return notifica;
-        }
-
-        @Override
-        public List<Notifica> perCliente(Long clienteId) {
             return List.of();
         }
     }

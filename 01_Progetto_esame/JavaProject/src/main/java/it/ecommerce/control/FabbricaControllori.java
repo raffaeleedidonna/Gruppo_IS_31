@@ -27,8 +27,8 @@ public final class FabbricaControllori {
     }
 
     public AutenticazioneController autenticazione() {
-        return new AutenticazioneControllerImpl(
-                new GestoreAutenticazione(transazioni, persistenza.utenteRepository()));
+        return new AutenticazioneControllerImpl(new GestoreAutenticazione(
+                transazioni, persistenza.utenteRepository(), persistenza.servizioNotifiche()));
     }
 
     public GestioneProdottiController gestioneProdotti() {
@@ -49,12 +49,13 @@ public final class FabbricaControllori {
     public OrdineClienteController ordineCliente() {
         return new OrdineClienteControllerImpl(new GestoreOrdiniCliente(
                 transazioni, persistenza.utenteRepository(), persistenza.ordineRepository(),
-                persistenza.notificaRepository(), persistenza.catalogoRepository()));
+                persistenza.servizioNotifiche(), persistenza.catalogoRepository()));
     }
 
     public GestioneOrdiniController gestioneOrdini() {
         return new GestioneOrdiniControllerImpl(new GestoreOrdini(
-                transazioni, persistenza.ordineRepository(), persistenza.catalogoRepository()));
+                transazioni, persistenza.ordineRepository(), persistenza.catalogoRepository(),
+                persistenza.servizioNotifiche()));
     }
 
     public ProfiloController profilo() {

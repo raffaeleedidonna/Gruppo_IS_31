@@ -3,11 +3,13 @@ package it.ecommerce.boundary;
 import java.awt.BorderLayout;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
@@ -27,6 +29,7 @@ public class CatalogoView extends JPanel {
     private final ModelloTabellaProdotti modello = new ModelloTabellaProdotti();
     private final JTable tabella = new JTable(modello);
     private final JTextField campoRicerca = new JTextField(16);
+    private final JTextArea dettaglioDescrizione = new JTextArea(3, 0);
 
     public CatalogoView(CatalogoController catalogo, CarrelloController carrello,
                         Long clienteId, Runnable dopoAggiunta) {
@@ -36,9 +39,33 @@ public class CatalogoView extends JPanel {
         this.clienteId = clienteId;
         this.dopoAggiunta = dopoAggiunta;
         tabella.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabella.getSelectionModel().addListSelectionListener(evento -> aggiornaDescrizione());
         add(creaBarraStrumenti(), BorderLayout.NORTH);
         add(new JScrollPane(tabella), BorderLayout.CENTER);
+        add(creaPannelloDettaglio(), BorderLayout.SOUTH);
         mostraCatalogo();
+    }
+
+    private JPanel creaPannelloDettaglio() {
+        JPanel pannello = new JPanel(new BorderLayout());
+        pannello.setBorder(BorderFactory.createTitledBorder("Descrizione"));
+        dettaglioDescrizione.setEditable(false);
+        dettaglioDescrizione.setLineWrap(true);
+        dettaglioDescrizione.setWrapStyleWord(true);
+        dettaglioDescrizione.setOpaque(false);
+        pannello.add(new JScrollPane(dettaglioDescrizione), BorderLayout.CENTER);
+        return pannello;
+    }
+
+    private void aggiornaDescrizione() {
+        int riga = tabella.getSelectedRow();
+        if (riga < 0) {
+            dettaglioDescrizione.setText("");
+            return;
+        }
+        ProdottoDTO prodotto = modello.prodottoA(tabella.convertRowIndexToModel(riga));
+        dettaglioDescrizione.setText(prodotto.descrizione());
+        dettaglioDescrizione.setCaretPosition(0);
     }
 
     private JToolBar creaBarraStrumenti() {
