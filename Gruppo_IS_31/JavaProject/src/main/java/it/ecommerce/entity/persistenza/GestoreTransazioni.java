@@ -1,0 +1,21 @@
+package it.ecommerce.entity.persistenza;
+
+public interface GestoreTransazioni {
+
+    UnitaDiLavoro apreUnitaDiLavoro();
+
+    default <R> R inTransazione(AzioneTransazionale<R> azione) {
+        UnitaDiLavoro unita = apreUnitaDiLavoro();
+        try {
+            unita.inizia();
+            R risultato = azione.esegui();
+            unita.conferma();
+            return risultato;
+        } catch (RuntimeException errore) {
+            unita.annulla();
+            throw errore;
+        } finally {
+            unita.chiudi();
+        }
+    }
+}
