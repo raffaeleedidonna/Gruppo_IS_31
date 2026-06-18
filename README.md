@@ -13,7 +13,7 @@ Prima di avviare il codice, devi collegarti alla VPN utilizzando WireGuard:
 **📂 B. Posizionati nella cartella corretta**
 Una volta connesso alla VPN, apri il terminale e spostati all'interno della cartella contenente il progetto Java:
 ```bash
-cd 01_Progetto_esame/JavaProject
+cd Gruppo_IS_31/JavaProject
 ```
 
 **🚀 C. Esegui il programma**
