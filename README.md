@@ -47,7 +47,7 @@ Per eseguire correttamente il programma, è necessario essere connessi alla rete
 **🌐 A. Connessione alla VPN**
 Prima di avviare il codice, devi collegarti alla VPN utilizzando WireGuard:
 1. Assicurati di avere **WireGuard** installato sul tuo computer.
-2. Apri WireGuard e importa il file di configurazione denominato `config_prof.wg`.
+2. Apri WireGuard e importa il file di configurazione denominato `wg_config.conf`.
 3. Clicca su **Attiva** (o "Connect") per stabilire la connessione alla VPN.
 
 **📂 B. Posizionati nella cartella corretta**
