@@ -21,3 +21,11 @@ Ora che sei nella cartella giusta e connesso alla VPN, puoi compilare ed eseguir
 ```bash
 mvn -q compile exec:java
 ```
+
+**🧪 D. Testare le funzionalità**
+Una volta avviato il programma, puoi provare i due tipi di accesso:
+
+- **Funzionalità cliente**: è sufficiente registrarsi fornendo una email e una password.
+- **Funzionalità amministratore**: accedi utilizzando le seguenti credenziali:
+  - **Email:** `admin@ecommerce.it`
+  - **Password:** `admin`
