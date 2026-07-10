@@ -5,6 +5,9 @@ public class Carrello {
 	 * @param prodotto
 	 * @param quantita
 	 */
+
+	List<RigaCarrello> righe;
+
 	public void aggiungi(int prodotto, int quantita) {
 		// TODO - implement Carrello.aggiungi
 		throw new UnsupportedOperationException();
@@ -73,6 +76,21 @@ public class Carrello {
 	public void svuotaCarrello() {
 		// TODO - implement Carrello.svuotaCarrello
 		throw new UnsupportedOperationException();
+	}
+
+
+	public boolean riversaIn(Ordine ordine){
+
+		for (RigaCarrello riga : righe){
+
+			Prodotto prodotto,  = riga.getProdotto();
+
+			ordine.aggiungiRiga(prodotto);
+
+			prodotto.scarica(quantita);
+
+
+		}
 	}
 
 }
