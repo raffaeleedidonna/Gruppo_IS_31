@@ -1,17 +1,19 @@
 package entity;
 
 public class Cliente extends Utente {
-	public Carrello carrello;
+	private Carrello carrello;
 
 	protected Cliente() {
-		throw new UnsupportedOperationException();
+		super();
 	}
 
-	public Cliente(String email, String passwordHash, String nome, String cognome, String indirizzo, String immagineProfilo) {
-		throw new UnsupportedOperationException();
+	public Cliente(String email, String passwordHash, String nome, String cognome, String indirizzo, byte[] immagineProfilo) {
+		super(email, passwordHash, nome, cognome, indirizzo, immagineProfilo);
+    this.carrello = new Carrello(this);
 	}
 
-	public String ruolo() {
-		throw new UnsupportedOperationException();
+	public Ruolo ruolo() {
+		return Ruolo.CLIENTE;
 	}
+
 }

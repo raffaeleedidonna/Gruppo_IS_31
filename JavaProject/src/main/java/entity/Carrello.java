@@ -1,19 +1,17 @@
 package entity;
 
 import java.util.ArrayList;
-import entity.RigaCarrello;
 
 public class Carrello {
 	private long id;
-	public Cliente cliente;
-	public ArrayList<RigaCarrello> righe = new ArrayList<RigaCarrello>();
+	private Cliente cliente;
+	private ArrayList<RigaCarrello> righe = new ArrayList<RigaCarrello>();
 
-	protected Carrello() {
-		throw new UnsupportedOperationException();
-	}
+	protected Carrello() {}
 
 	public Carrello(Cliente cliente) {
-		throw new UnsupportedOperationException();
+    this.cliente = cliente;
+    this.righe = new ArrayList<RigaCarrello>();
 	}
 
 	public boolean aggiungiProdotto(Prodotto prodotto, long quantita) {
