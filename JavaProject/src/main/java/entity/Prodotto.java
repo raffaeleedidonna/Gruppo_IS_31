@@ -9,8 +9,10 @@ public class Prodotto {
 	private boolean disponibile;
 	private boolean inOfferta;
 	public Categoria categoria;
+  
+  public double getPrezzo() {return prezzo;}
+  
+  public boolean haScortaPer(long quantita) { return quantita <= quantitaMagazzino; }
 
-	public boolean scarica(long quantita) {
-		throw new UnsupportedOperationException();
-	}
+	public void scarica(long quantita) { quantitaMagazzino -= quantita; }
 }

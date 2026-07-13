@@ -3,21 +3,20 @@ package entity;
 public class RigaCarrello {
 	private long id;
 	private long quantita;
-	public Prodotto prodotto;
+	private Prodotto prodotto;
 
-	protected RigaCarrello() {
-		throw new UnsupportedOperationException();
-	}
+	protected RigaCarrello() {}
 
-	public RigaCarrello(Prodotto prodotto, long quantità) {
-		throw new UnsupportedOperationException();
+	public RigaCarrello(Prodotto prodotto, long quantita) {
+		this.prodotto = prodotto;
+    this.quantita = quantita;
 	}
 
 	public double calcolaSubtotale() {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean verificaDisponibilitaProdotto() {
-		throw new UnsupportedOperationException();
-	}
+	public boolean haScortaSufficiente() { return prodotto.haScortaPer(quantita); }
+
+  public RigaOrdine creaRigaOrdine() { return new RigaOrdine(prodotto, quantita); }
 }

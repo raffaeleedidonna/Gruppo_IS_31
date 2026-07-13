@@ -23,4 +23,6 @@ public abstract class Utente {
 	public abstract Ruolo ruolo();
 
   public long getId() {return this.id;}
+
+  public String getIndirizzo() { return this.indirizzo; }
 }
