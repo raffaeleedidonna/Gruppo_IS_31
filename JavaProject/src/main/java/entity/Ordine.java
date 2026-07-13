@@ -20,8 +20,13 @@ public class Ordine {
     this.indirizzoSpedizione = cliente.getIndirizzo();
     this.stato = StatoOrdine.INSERITO;
     this.cliente = cliente;
-
 	}
+
+	public long getId() {return id;}
+	public LocalDateTime getDataCreazione() {return dataCreazione;}
+	public double getTotaleComplessivo() {return totaleComplessivo;}
+	public String getIndirizzoSpedizione() {return indirizzoSpedizione;}
+	public StatoOrdine getStato() {return stato;}
 
 	public void aggiungiRiga(RigaOrdine riga) {
     righe.add(riga);

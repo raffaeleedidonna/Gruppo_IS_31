@@ -5,6 +5,9 @@ import java.util.List;
 
 import database.GestorePersistenza;
 
+import java.util.List;
+import java.util.Map;
+
 public class RegistroOrdini {
 	private GestorePersistenza gestorePersistenza = new GestorePersistenza();
 
@@ -23,6 +26,6 @@ public class RegistroOrdini {
 	}
 
 	public List<Ordine> cercaOrdini() {
-		throw new UnsupportedOperationException();
+		return gestorePersistenza.cercaPerCampi(Ordine.class, Map.of());
 	}
 }
