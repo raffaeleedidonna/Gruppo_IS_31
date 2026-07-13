@@ -4,17 +4,19 @@ public class RigaOrdine {
 	private long id;
 	private long quantitaAcquistata;
 	private double prezzoDiAcquisto;
-	public Prodotto prodotto;
+	private Prodotto prodotto;
 
-	protected RigaOrdine() {
-		throw new UnsupportedOperationException();
+	protected RigaOrdine() {}
+
+	public RigaOrdine(Prodotto prodotto, long quantitaAcquistata) {
+		this.prodotto = prodotto;
+    this.quantitaAcquistata = quantitaAcquistata;
+    this.prezzoDiAcquisto = prodotto.getPrezzo();
 	}
 
-	public RigaOrdine(Prodotto prodotto, long quantitaAcquistata, double prezzoDiAcquisto) {
-		throw new UnsupportedOperationException();
-	}
+  public Prodotto getProdotto() { return prodotto; }
 
-	public double calcolaSubtotale() {
-		throw new UnsupportedOperationException();
-	}
+	public double calcolaSubtotale() { return prezzoDiAcquisto * quantitaAcquistata;}
+
+  public void scarica() { prodotto.scarica(quantitaAcquistata); }
 }

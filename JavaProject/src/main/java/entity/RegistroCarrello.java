@@ -1,5 +1,7 @@
 package entity;
 
+import java.util.Map;
+
 import database.GestorePersistenza;
 
 import java.util.Map;
@@ -8,7 +10,6 @@ public class RegistroCarrello {
 	private GestorePersistenza gestorePersistenza = new GestorePersistenza();
 
 	public Carrello cercaCarrelloPerCliente(long idCliente) {
-
 		return gestorePersistenza.cercaPrimoPerCampi(
 				Carrello.class,
 				Map.of("cliente.id", idCliente)

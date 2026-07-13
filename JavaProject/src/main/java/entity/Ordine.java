@@ -1,7 +1,8 @@
 package entity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import entity.RigaOrdine;
+import java.util.List;
 
 public class Ordine {
 	private long id;
@@ -9,22 +10,30 @@ public class Ordine {
 	private double totaleComplessivo;
 	private String indirizzoSpedizione;
 	private StatoOrdine stato;
-	public Cliente cliente;
-	public ArrayList<RigaOrdine> righe = new ArrayList<RigaOrdine>();
+	private Cliente cliente;
+	private ArrayList<RigaOrdine> righe = new ArrayList<RigaOrdine>();
 
-	protected Ordine() {
-		throw new UnsupportedOperationException();
+	protected Ordine() {}
+
+	public Ordine(Cliente cliente) {
+    this.dataCreazione = LocalDateTime.now();
+    this.indirizzoSpedizione = cliente.getIndirizzo();
+    this.stato = StatoOrdine.INSERITO;
+    this.cliente = cliente;
+
 	}
 
-	public Ordine(Cliente cliente, String indirizzoSpedizione) {
-		throw new UnsupportedOperationException();
+	public void aggiungiRiga(RigaOrdine riga) {
+    righe.add(riga);
+    this.totaleComplessivo += riga.calcolaSubtotale();
 	}
 
-	public double calcolaTotale() {
-		throw new UnsupportedOperationException();
-	}
-
-	public boolean aggiungiRiga(Prodotto prodotto, long quantita, double prezzoCorrente) {
-		throw new UnsupportedOperationException();
-	}
+  public List<Prodotto> scaricaMagazzino() {
+      List<Prodotto> scaricati = new ArrayList<>();
+      for (RigaOrdine riga : righe) {
+        riga.scarica();
+        scaricati.add(riga.getProdotto());
+      }
+      return scaricati;
+  }
 }

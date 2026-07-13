@@ -21,17 +21,16 @@ public class Prodotto {
 	@JoinColumn(name = "categoria_id")
 	private Categoria categoria;
 
-	public boolean scarica(long quantita) {
-		throw new UnsupportedOperationException();
-	}
+	public void scarica(long quantita) { quantitaMagazzino -= quantita; }
 
-  public boolean isVendibilePer(long quantita) {
-    return disponibile && quantita <= quantitaMagazzino;
-  }
+	public boolean isVendibilePer(long quantita) {
+		return disponibile && quantita <= quantitaMagazzino;
+	}
 
 	//Getter
 	public long getId(){return id;}
 	public long getQuantitaMagazzino(){ return quantitaMagazzino; }
 	public boolean isDisponibile(){ return disponibile; }
+	public double getPrezzo() {return prezzo;}
 
 }

@@ -26,6 +26,10 @@ public class Carrello {
     this.righe = new ArrayList<RigaCarrello>();
 	}
 
+  public Cliente getCliente() {
+    return cliente;
+  }
+
   public boolean puoAggiungere(Prodotto prodotto, long quantita) {
     long totale = quantitaInCarrello(prodotto) + quantita;
     return prodotto.isVendibilePer(totale);
@@ -42,7 +46,7 @@ public class Carrello {
     return null;
   }
 
-  public void aggiungiProdotto(Prodotto prodotto, long quantita) {      
+  public void aggiungiProdotto(Prodotto prodotto, long quantita) {
     RigaCarrello riga = trovaRiga(prodotto);
     if (riga != null) riga.incrementaQuantita(quantita);
     else righe.add(new RigaCarrello(prodotto, quantita));
@@ -52,19 +56,24 @@ public class Carrello {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean svuotaCarrello() {
-		throw new UnsupportedOperationException();
+	public void svuota() {
+	  righe.clear();
 	}
 
 	public boolean isEmpty() {
-		throw new UnsupportedOperationException();
+		return righe.isEmpty();
 	}
 
-	public boolean verificaDisponibilitaRighe() {
-		throw new UnsupportedOperationException();
+	public boolean haTutteRigheVendibili() {
+		for(RigaCarrello riga : righe) {
+      if(!riga.isVendibile()) {return false;} 
+    }
+    return true;
 	}
 
-	public boolean riversaIn(Ordine ordine) {
-		throw new UnsupportedOperationException();
+	public void riversaIn(Ordine ordine) {
+		for (RigaCarrello riga : righe) {
+      ordine.aggiungiRiga(riga.creaRigaOrdine());
+    }
 	}
 }

@@ -15,7 +15,7 @@ public class RigaCarrello {
 	@JoinColumn(name = "prodotto_id", nullable = false)
 	private Prodotto prodotto;
 
-	protected RigaCarrello() {};
+	protected RigaCarrello() {}
 
 	public RigaCarrello(Prodotto prodotto, long quantita) {
 		this.prodotto = prodotto;
@@ -39,4 +39,8 @@ public class RigaCarrello {
 	}
 
 	public long getQuantita(){return quantita;}
+
+	public boolean isVendibile() { return prodotto.isVendibilePer(quantita); }
+
+  public RigaOrdine creaRigaOrdine() { return new RigaOrdine(prodotto, quantita); }
 }

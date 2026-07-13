@@ -1,4 +1,3 @@
 package entity;
 
-public enum StatoOrdine {
-}
+public enum StatoOrdine { INSERITO, IN_PREPARAZIONE, SPEDITO, CONSEGNATO }
