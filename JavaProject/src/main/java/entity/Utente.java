@@ -9,20 +9,20 @@ public abstract class Utente {
 	private String nome;
 	private String cognome;
 
-  protected Utente() {}
+	protected Utente() {}
 
 	protected Utente(String email, String passwordHash, String nome, String cognome, String indirizzo, byte[] immagineProfilo) {
 		this.email=email;
-    this.passwordHash=passwordHash;
-    this.nome=nome;
-    this.cognome=cognome;
-    this.indirizzo=indirizzo;
-    this.immagineProfilo=immagineProfilo;
+		this.passwordHash=passwordHash;
+		this.nome=nome;
+		this.cognome=cognome;
+		this.indirizzo=indirizzo;
+		this.immagineProfilo=immagineProfilo;
 	}
 
 	public abstract Ruolo ruolo();
 
-  public long getId() {return this.id;}
+	public long getId() {return this.id;}
 
-  public String getIndirizzo() { return this.indirizzo; }
+	public String getIndirizzo() { return this.indirizzo; }
 }

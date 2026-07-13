@@ -10,10 +10,10 @@ public class RegistroProdotti {
 
 	public Prodotto cercaProdottoPerId(long idProdotto) {
 		return gestorePersistenza.trovaPerId(Prodotto.class, idProdotto);
-  }
+	}
 
 	public List<Prodotto> cercaProdottiInCatalogo() {
 
-		return gestorePersistenza.cercaPerCampi(Prodotto.class, Map.of());
+		return gestorePersistenza.cercaPerCampi(Prodotto.class, Map.of("disponibile", true));
 	}
 }

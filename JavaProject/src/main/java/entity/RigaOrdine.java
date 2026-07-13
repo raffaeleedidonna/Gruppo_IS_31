@@ -10,13 +10,13 @@ public class RigaOrdine {
 
 	public RigaOrdine(Prodotto prodotto, long quantitaAcquistata) {
 		this.prodotto = prodotto;
-    this.quantitaAcquistata = quantitaAcquistata;
-    this.prezzoDiAcquisto = prodotto.getPrezzo();
+		this.quantitaAcquistata = quantitaAcquistata;
+		this.prezzoDiAcquisto = prodotto.getPrezzo();
 	}
 
-  public Prodotto getProdotto() { return prodotto; }
+	public Prodotto getProdotto() { return prodotto; }
 
 	public double calcolaSubtotale() { return prezzoDiAcquisto * quantitaAcquistata;}
 
-  public void scarica() { prodotto.scarica(quantitaAcquistata); }
+	public void scarica() { prodotto.scarica(quantitaAcquistata); }
 }

@@ -8,7 +8,7 @@ public class RegistroUtenti {
 
 	public boolean registraCliente(String email, String passwordHash, String nome, String cognome, String indirizzo, byte[] immagineProfilo) {
 		Cliente cliente = new Cliente(email, passwordHash, nome, cognome, indirizzo, immagineProfilo);
-    return gestorePersistenza.salva(cliente);
+		return gestorePersistenza.salva(cliente);
 	}
 
 	public Utente cercaUtentePerEmail(String email) {

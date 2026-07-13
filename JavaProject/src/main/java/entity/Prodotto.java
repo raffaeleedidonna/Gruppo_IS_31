@@ -1,13 +1,7 @@
 package entity;
 
-import jakarta.persistence.*;
-
-@Entity
 public class Prodotto {
 
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
 	private String nome;
@@ -17,8 +11,6 @@ public class Prodotto {
 	private boolean disponibile;
 	private boolean inOfferta;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "categoria_id")
 	private Categoria categoria;
 
 	public void scarica(long quantita) { quantitaMagazzino -= quantita; }
@@ -28,36 +20,20 @@ public class Prodotto {
 	}
 
 	//Getter
-	public long getId() {
-		return id;
-	}
+	public long getId() {return id;}
 
-	public String getNome() {
-		return nome;
-	}
+	public String getNome() {return nome;}
 
-	public String getDescrizione() {
-		return descrizione;
-	}
+	public String getDescrizione() {return descrizione;}
 
-	public double getPrezzo() {
-		return prezzo;
-	}
+	public double getPrezzo() {return prezzo;}
 
-	public long getQuantitaMagazzino() {
-		return quantitaMagazzino;
-	}
+	public long getQuantitaMagazzino() {return quantitaMagazzino;}
 
-	public boolean isDisponibile() {
-		return disponibile;
-	}
+	public boolean isDisponibile() {return disponibile;}
 
-	public boolean isInOfferta() {
-		return inOfferta;
-	}
+	public boolean isInOfferta() {return inOfferta;}
 
-	public Categoria getCategoria() {
-		return categoria;
-	}
+	public Categoria getCategoria() {return categoria;}
 
 }

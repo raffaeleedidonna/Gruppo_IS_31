@@ -22,7 +22,7 @@ public class ControllerProdotti {
 				String.valueOf(p.getQuantitaMagazzino()),
 				String.valueOf(p.isDisponibile()),
 				String.valueOf(p.isInOfferta()),
-				String.valueOf(p.getCategoria()),
+				String.valueOf(p.getCategoria().getNome()),
 			};
 
 			righe.add(riga);

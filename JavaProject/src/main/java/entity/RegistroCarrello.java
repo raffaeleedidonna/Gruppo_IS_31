@@ -4,8 +4,6 @@ import java.util.Map;
 
 import database.GestorePersistenza;
 
-import java.util.Map;
-
 public class RegistroCarrello {
 	private GestorePersistenza gestorePersistenza = new GestorePersistenza();
 
@@ -15,7 +13,6 @@ public class RegistroCarrello {
 				Map.of("cliente.id", idCliente)
 		);
 	}
-
 
 	public boolean registraCarrello(Carrello carrello) {
 		return gestorePersistenza.salva(carrello);

@@ -9,7 +9,7 @@ public class Cliente extends Utente {
 
 	public Cliente(String email, String passwordHash, String nome, String cognome, String indirizzo, byte[] immagineProfilo) {
 		super(email, passwordHash, nome, cognome, indirizzo, immagineProfilo);
-    this.carrello = new Carrello(this);
+		carrello = new Carrello(this);
 	}
 
 	public Ruolo ruolo() {

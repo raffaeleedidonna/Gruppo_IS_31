@@ -1,18 +1,11 @@
 package entity;
 
-import jakarta.persistence.*;
-
-@Entity
 public class RigaCarrello {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
 	private long quantita;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "prodotto_id", nullable = false)
 	private Prodotto prodotto;
 
 	protected RigaCarrello() {}
@@ -22,15 +15,11 @@ public class RigaCarrello {
 		this.quantita = quantita;
 	}
 
-  public boolean haProdotto(Prodotto prodotto) {
-    return this.prodotto.getId() == prodotto.getId();
-  }
-
-	public double calcolaSubtotale() {
-		throw new UnsupportedOperationException();
+	public boolean haProdotto(Prodotto prodotto) {
+		return this.prodotto.getId() == prodotto.getId();
 	}
 
-	public boolean verificaDisponibilitaProdotto() {
+	public double calcolaSubtotale() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -38,9 +27,11 @@ public class RigaCarrello {
 		this.quantita += quantita;
 	}
 
-	public long getQuantita(){return quantita;}
-
 	public boolean isVendibile() { return prodotto.isVendibilePer(quantita); }
 
-  public RigaOrdine creaRigaOrdine() { return new RigaOrdine(prodotto, quantita); }
+	public RigaOrdine creaRigaOrdine() { return new RigaOrdine(prodotto, quantita); }
+
+	//Getter
+	public long getQuantita(){return quantita;}
+
 }
