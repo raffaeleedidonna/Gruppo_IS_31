@@ -13,4 +13,37 @@ public class Prodotto {
 	public boolean scarica(long quantita) {
 		throw new UnsupportedOperationException();
 	}
+
+	public long getId() {
+		return id;
+	}
+
+	public String getNome() {
+		return nome;
+	}
+
+	public String getDescrizione() {
+		return descrizione;
+	}
+
+	public double getPrezzo() {
+		return prezzo;
+	}
+
+	public long getQuantitaMagazzino() {
+		return quantitaMagazzino;
+	}
+
+	public boolean isDisponibile() {
+		return disponibile;
+	}
+
+	public boolean isInOfferta() {
+		return inOfferta;
+	}
+
+	public Categoria getCategoria() {
+		return categoria;
+	}
+
 }

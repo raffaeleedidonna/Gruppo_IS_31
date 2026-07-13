@@ -2,14 +2,18 @@ package entity;
 
 import database.GestorePersistenza;
 
+import java.util.List;
+import java.util.Map;
+
 public class RegistroProdotti {
-	public GestorePersistenza gestorePersistenza;
+	private GestorePersistenza gestorePersistenza = new GestorePersistenza();
 
 	public Prodotto cercaProdottoPerId(long idProdotto) {
 		throw new UnsupportedOperationException();
 	}
 
 	public List<Prodotto> cercaProdottiInCatalogo() {
-		throw new UnsupportedOperationException();
+
+		return gestorePersistenza.cercaPerCampi(Prodotto.class, Map.of());
 	}
 }
