@@ -26,37 +26,27 @@ public class Carrello {
     this.righe = new ArrayList<RigaCarrello>();
 	}
 
-	public long getQuantitaProdotto(long idProdotto){
+  public boolean puoAggiungere(Prodotto prodotto, long quantita) {
+    long totale = quantitaInCarrello(prodotto) + quantita;
+    return prodotto.isVendibilePer(totale);
+  }
 
-		for (RigaCarrello riga : righe) {
+  private long quantitaInCarrello(Prodotto prodotto) {
+    RigaCarrello riga = trovaRiga(prodotto);
+    return riga == null ? 0 : riga.getQuantita();
+  }
 
-			if (riga.getProdotto().getId() == idProdotto){
+  private RigaCarrello trovaRiga(Prodotto prodotto) {
+    for (RigaCarrello riga : righe) if (riga.haProdotto(prodotto))
+  return riga;
+    return null;
+  }
 
-				return riga.getQuantita();
-			}
-		}
-
-		return 0;
-	}
-
-	public boolean aggiungiProdotto(Prodotto prodotto, long quantita) {
-
-		//Verifico se esiste già una riga per il prodotto richiesto, se si aumento la quantità nel carrello
-
-		for (RigaCarrello riga : righe){
-			if(riga.getProdotto().getId() == prodotto.getId()){
-				riga.incrementaQuantita(quantita);
-				return true;
-			}
-		}
-
-		//Se non è stato trovato, creo una riga per quel prodotto e la aggiungo alla lista di righe
-		RigaCarrello riga = new RigaCarrello(prodotto, quantita);
-
-		boolean esito = righe.add(riga);
-
-		return esito;
-	}
+  public void aggiungiProdotto(Prodotto prodotto, long quantita) {      
+    RigaCarrello riga = trovaRiga(prodotto);
+    if (riga != null) riga.incrementaQuantita(quantita);
+    else righe.add(new RigaCarrello(prodotto, quantita));
+  }
 
 	public double calcolaTotale() {
 		throw new UnsupportedOperationException();

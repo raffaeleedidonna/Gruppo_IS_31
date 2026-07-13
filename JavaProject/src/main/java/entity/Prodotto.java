@@ -25,6 +25,10 @@ public class Prodotto {
 		throw new UnsupportedOperationException();
 	}
 
+  public boolean isVendibilePer(long quantita) {
+    return disponibile && quantita <= quantitaMagazzino;
+  }
+
 	//Getter
 	public long getId(){return id;}
 	public long getQuantitaMagazzino(){ return quantitaMagazzino; }

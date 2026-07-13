@@ -22,6 +22,10 @@ public class RigaCarrello {
 		this.quantita = quantita;
 	}
 
+  public boolean haProdotto(Prodotto prodotto) {
+    return this.prodotto.getId() == prodotto.getId();
+  }
+
 	public double calcolaSubtotale() {
 		throw new UnsupportedOperationException();
 	}
@@ -34,7 +38,5 @@ public class RigaCarrello {
 		this.quantita += quantita;
 	}
 
-	//Getter
-	public Prodotto getProdotto(){return prodotto;}
 	public long getQuantita(){return quantita;}
 }
