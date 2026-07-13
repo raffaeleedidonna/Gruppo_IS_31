@@ -21,7 +21,7 @@ public class ControllerCarrello {
 
 		Prodotto p = regp.cercaProdottoPerId(idProdotto);
 
-		if (p == null || c == null || quantita <= 0){
+		if (p == null || c == null || quantita <= 0 || !p.isDisponibile()){
 			return false;
 		}
 

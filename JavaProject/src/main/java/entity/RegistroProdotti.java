@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 public class RegistroProdotti {
-	public GestorePersistenza gestorePersistenza;
+	private GestorePersistenza gestorePersistenza = new GestorePersistenza();
 
 	public Prodotto cercaProdottoPerId(long idProdotto) {
+
+
 		return gestorePersistenza.cercaPrimoPerCampi(
 				Prodotto.class,
 				Map.of("prodotto.id", idProdotto)

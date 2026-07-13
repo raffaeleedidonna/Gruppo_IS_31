@@ -1,11 +1,23 @@
 package entity;
 
-import java.util.ArrayList;
+import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
 public class Carrello {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
+
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "cliente_id", unique = true, nullable = false)
 	private Cliente cliente;
-	private ArrayList<RigaCarrello> righe = new ArrayList<RigaCarrello>();
+
+	@OneToMany(mappedBy = "carrello", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<RigaCarrello> righe = new ArrayList<RigaCarrello>();
 
 	protected Carrello() {}
 
@@ -28,7 +40,22 @@ public class Carrello {
 	}
 
 	public boolean aggiungiProdotto(Prodotto prodotto, long quantita) {
-		throw new UnsupportedOperationException();
+
+		//Verifico se esiste già una riga per il prodotto richiesto, se si aumento la quantità nel carrello
+
+		for (RigaCarrello riga : righe){
+			if(riga.getProdotto().getId() == prodotto.getId()){
+				riga.incrementaQuantita(quantita);
+				return true;
+			}
+		}
+
+		//Se non è stato trovato, creo una riga per quel prodotto e la aggiungo alla lista di righe
+		RigaCarrello riga = new RigaCarrello(prodotto, quantita);
+
+		boolean esito = righe.add(riga);
+
+		return esito;
 	}
 
 	public double calcolaTotale() {

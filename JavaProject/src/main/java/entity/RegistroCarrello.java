@@ -5,7 +5,7 @@ import database.GestorePersistenza;
 import java.util.Map;
 
 public class RegistroCarrello {
-	public GestorePersistenza gestorePersistenza;
+	private GestorePersistenza gestorePersistenza = new GestorePersistenza();
 
 	public Carrello cercaCarrelloPerCliente(long idCliente) {
 
