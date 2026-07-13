@@ -3,7 +3,7 @@ package entity;
 public class RigaCarrello {
 	private long id;
 	private long quantita;
-	public Prodotto prodotto;
+	private Prodotto prodotto;
 
 	protected RigaCarrello() {
 		throw new UnsupportedOperationException();
@@ -20,4 +20,8 @@ public class RigaCarrello {
 	public boolean verificaDisponibilitaProdotto() {
 		throw new UnsupportedOperationException();
 	}
+
+	//Getter
+	public Prodotto getProdotto(){return prodotto;}
+	public long getQuantita(){return quantita;}
 }

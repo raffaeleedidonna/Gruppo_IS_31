@@ -14,6 +14,19 @@ public class Carrello {
     this.righe = new ArrayList<RigaCarrello>();
 	}
 
+	public long getQuantitaProdotto(long idProdotto){
+
+		for (RigaCarrello riga : righe) {
+
+			if (riga.getProdotto().getId() == idProdotto){
+
+				return riga.getQuantita();
+			}
+		}
+
+		return 0;
+	}
+
 	public boolean aggiungiProdotto(Prodotto prodotto, long quantita) {
 		throw new UnsupportedOperationException();
 	}

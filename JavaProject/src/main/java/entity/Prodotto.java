@@ -8,9 +8,14 @@ public class Prodotto {
 	private long quantitaMagazzino;
 	private boolean disponibile;
 	private boolean inOfferta;
-	public Categoria categoria;
+	private Categoria categoria;
 
 	public boolean scarica(long quantita) {
 		throw new UnsupportedOperationException();
 	}
+
+	//Getter
+	public long getId(){return id;}
+	public long getQuantitaMagazzino(){ return quantitaMagazzino; }
+
 }
