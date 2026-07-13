@@ -28,9 +28,36 @@ public class Prodotto {
 	}
 
 	//Getter
-	public long getId(){return id;}
-	public long getQuantitaMagazzino(){ return quantitaMagazzino; }
-	public boolean isDisponibile(){ return disponibile; }
-	public double getPrezzo() {return prezzo;}
+	public long getId() {
+		return id;
+	}
+
+	public String getNome() {
+		return nome;
+	}
+
+	public String getDescrizione() {
+		return descrizione;
+	}
+
+	public double getPrezzo() {
+		return prezzo;
+	}
+
+	public long getQuantitaMagazzino() {
+		return quantitaMagazzino;
+	}
+
+	public boolean isDisponibile() {
+		return disponibile;
+	}
+
+	public boolean isInOfferta() {
+		return inOfferta;
+	}
+
+	public Categoria getCategoria() {
+		return categoria;
+	}
 
 }

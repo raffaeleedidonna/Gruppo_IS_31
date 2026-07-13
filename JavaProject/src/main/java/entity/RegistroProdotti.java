@@ -3,6 +3,7 @@ package entity;
 import database.GestorePersistenza;
 
 import java.util.List;
+import java.util.Map;
 
 public class RegistroProdotti {
 	private GestorePersistenza gestorePersistenza = new GestorePersistenza();
@@ -12,6 +13,7 @@ public class RegistroProdotti {
   }
 
 	public List<Prodotto> cercaProdottiInCatalogo() {
-		throw new UnsupportedOperationException();
+
+		return gestorePersistenza.cercaPerCampi(Prodotto.class, Map.of());
 	}
 }
