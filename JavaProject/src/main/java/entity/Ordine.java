@@ -1,5 +1,6 @@
 package entity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import entity.RigaOrdine;
 
@@ -9,11 +10,18 @@ public class Ordine {
 	private double totaleComplessivo;
 	private String indirizzoSpedizione;
 	private StatoOrdine stato;
-	public Cliente cliente;
-	public ArrayList<RigaOrdine> righe = new ArrayList<RigaOrdine>();
+	private Cliente cliente;
+	private ArrayList<RigaOrdine> righe = new ArrayList<RigaOrdine>();
+
+	public long getId() {return id;}
+	public LocalDateTime getDataCreazione() {return dataCreazione;}
+	public double getTotaleComplessivo() {return totaleComplessivo;}
+	public String getIndirizzoSpedizione() {return indirizzoSpedizione;}
+	public StatoOrdine getStato() {return stato;}
+
 
 	protected Ordine() {
-		throw new UnsupportedOperationException();
+
 	}
 
 	public Ordine(Cliente cliente, String indirizzoSpedizione) {

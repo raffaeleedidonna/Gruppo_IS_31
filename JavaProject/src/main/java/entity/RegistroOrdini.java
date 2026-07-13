@@ -2,14 +2,17 @@ package entity;
 
 import database.GestorePersistenza;
 
+import java.util.List;
+import java.util.Map;
+
 public class RegistroOrdini {
-	public GestorePersistenza gestorePersistenza;
+	private GestorePersistenza gestorePersistenza = new GestorePersistenza();
 
 	public boolean registraOrdineDa(Carrello carrello, String indirizzoSpedizione) {
 		throw new UnsupportedOperationException();
 	}
 
 	public List<Ordine> cercaOrdini() {
-		throw new UnsupportedOperationException();
+		return gestorePersistenza.cercaPerCampi(Ordine.class, Map.of());
 	}
 }
