@@ -12,7 +12,9 @@ public class Prodotto {
   
   public double getPrezzo() {return prezzo;}
   
-  public boolean haScortaPer(long quantita) { return quantita <= quantitaMagazzino & disponibile; }
+  public boolean isVendibilePer(long quantita) { 
+    return disponibile && quantita <= quantitaMagazzino; 
+  }
 
 	public void scarica(long quantita) { quantitaMagazzino -= quantita; }
 }

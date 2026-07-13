@@ -34,9 +34,9 @@ public class Carrello {
 		return righe.isEmpty();
 	}
 
-	public boolean haScorteSufficienti() {
+	public boolean haTutteRigheVendibili() {
 		for(RigaCarrello riga : righe) {
-      if(!riga.haScortaSufficiente()) {return false;} 
+      if(!riga.isVendibile()) {return false;} 
     }
     return true;
 	}

@@ -16,7 +16,7 @@ public class ControllerOrdini {
 
     if (carrello == null || carrello.isEmpty()) {return false;}
     
-    if (!carrello.haScorteSufficienti()) {return false;}
+    if (!carrello.haTutteRigheVendibili()) {return false;}
 
     return reg_o.registraOrdineDa(carrello);
 	}

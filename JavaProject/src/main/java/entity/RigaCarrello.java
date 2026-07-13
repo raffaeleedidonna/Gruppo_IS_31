@@ -16,7 +16,7 @@ public class RigaCarrello {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean haScortaSufficiente() { return prodotto.haScortaPer(quantita); }
+	public boolean isVendibile() { return prodotto.isVendibilePer(quantita); }
 
   public RigaOrdine creaRigaOrdine() { return new RigaOrdine(prodotto, quantita); }
 }
