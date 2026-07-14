@@ -1,7 +1,12 @@
 package entity;
 
+import jakarta.persistence.*;
+
+@Entity
 public class Prodotto {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
 	private String nome;
@@ -11,6 +16,8 @@ public class Prodotto {
 	private boolean disponibile;
 	private boolean inOfferta;
 
+	@ManyToOne
+	@JoinColumn(name = "categoria_id")
 	private Categoria categoria;
 
 	public void scarica(long quantita) { quantitaMagazzino -= quantita; }

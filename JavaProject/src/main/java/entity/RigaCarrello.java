@@ -1,11 +1,18 @@
 package entity;
 
+import jakarta.persistence.*;
+
+@Entity
 public class RigaCarrello {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
 	private long quantita;
 
+	@ManyToOne
+	@JoinColumn(name = "prodotto_id")
 	private Prodotto prodotto;
 
 	protected RigaCarrello() {}

@@ -1,14 +1,23 @@
 package entity;
 
+import jakarta.persistence.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
 public class Carrello {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
+	@OneToOne
+	@JoinColumn(name = "cliente_id", unique = true)
 	private Cliente cliente;
 
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+	@JoinColumn(name = "carrello_id")
 	private List<RigaCarrello> righe = new ArrayList<RigaCarrello>();
 
 	protected Carrello() {}

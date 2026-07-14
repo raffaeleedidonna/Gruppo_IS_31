@@ -1,9 +1,19 @@
 package entity;
 
+import jakarta.persistence.*;
+
+@Entity
 public class RigaOrdine {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
+
 	private long quantitaAcquistata;
 	private double prezzoDiAcquisto;
+
+	@ManyToOne
+	@JoinColumn(name = "prodotto_id")
 	private Prodotto prodotto;
 
 	protected RigaOrdine() {}

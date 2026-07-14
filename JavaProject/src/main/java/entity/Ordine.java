@@ -1,17 +1,32 @@
 package entity;
 
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
 public class Ordine {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
+
 	private LocalDateTime dataCreazione;
 	private double totaleComplessivo;
 	private String indirizzoSpedizione;
+
+	@Enumerated(EnumType.STRING)
 	private StatoOrdine stato;
+
+	@ManyToOne
+	@JoinColumn(name = "cliente_id")
 	private Cliente cliente;
-	private ArrayList<RigaOrdine> righe = new ArrayList<RigaOrdine>();
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+	@JoinColumn(name = "ordine_id")
+	private List<RigaOrdine> righe = new ArrayList<RigaOrdine>();
 
 	protected Ordine() {}
 

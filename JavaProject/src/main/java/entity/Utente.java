@@ -1,11 +1,24 @@
 package entity;
 
+import jakarta.persistence.*;
+
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class Utente {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
+
+	@Column(unique = true)
 	private String email;
+
 	private String passwordHash;
 	private String indirizzo;
+
+	@Lob
 	private byte[] immagineProfilo;
+
 	private String nome;
 	private String cognome;
 

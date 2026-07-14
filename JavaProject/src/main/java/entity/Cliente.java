@@ -1,6 +1,11 @@
 package entity;
 
+import jakarta.persistence.*;
+
+@Entity
 public class Cliente extends Utente {
+
+	@OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Carrello carrello;
 
 	protected Cliente() {
