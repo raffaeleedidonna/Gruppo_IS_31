@@ -42,7 +42,7 @@ public class FormOrdini {
 
 	private void caricaOrdini() {
 		List<String[]> righe = ControllerOrdini.getOrdini();
-		String[] colonne = {"Id", "Data", "Totale (€)", "Indirizzo di spedizione", "Stato"};
+		String[] colonne = {"Id", "Cliente", "Data", "Totale (€)", "Indirizzo di spedizione", "Stato"};
 		DefaultTableModel model = new DefaultTableModel(colonne, 0) {
 			@Override
 			public boolean isCellEditable(int riga, int colonna) {
@@ -52,7 +52,7 @@ public class FormOrdini {
 		DateTimeFormatter formatoData = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 		for (String[] riga : righe) {
 			String data = LocalDateTime.parse(riga[1]).format(formatoData);
-			model.addRow(new String[]{riga[0], data, riga[2], riga[3], riga[4]});
+			model.addRow(new String[]{riga[0], riga[5], data, riga[2], riga[3], riga[4]});
 		}
 		table_ordini.setModel(model);
 		table_ordini.setAutoCreateRowSorter(true);

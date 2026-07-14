@@ -61,4 +61,6 @@ public class Ordine {
 	public String getIndirizzoSpedizione() {return indirizzoSpedizione;}
 
 	public StatoOrdine getStato() {return stato;}
+
+	public Cliente getCliente()  {return cliente;}
 }

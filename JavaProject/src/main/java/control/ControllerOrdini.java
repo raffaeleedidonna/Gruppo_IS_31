@@ -35,7 +35,8 @@ public class ControllerOrdini {
 			ordine.getDataCreazione().toString(),
 			String.valueOf(ordine.getTotaleComplessivo()),
 			ordine.getIndirizzoSpedizione(),
-			ordine.getStato().name()
+			ordine.getStato().name(),
+			String.valueOf(ordine.getCliente().getId()),
 		};
 	}
 }
