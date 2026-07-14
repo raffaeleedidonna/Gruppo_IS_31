@@ -20,7 +20,7 @@ public class RegistroOrdini {
 		daPersistere.add(carrello);
 		daPersistere.addAll(prodottiScaricati);
 
-		return gestorePersistenza.salvaTutti(daPersistere.toArray());
+		return gestorePersistenza.aggiornaTutti(daPersistere.toArray());
 	}
 
 	public List<Ordine> cercaOrdini() {

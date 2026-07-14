@@ -15,6 +15,6 @@ public class RegistroCarrello {
 	}
 
 	public boolean registraCarrello(Carrello carrello) {
-		return gestorePersistenza.salva(carrello);
+		return gestorePersistenza.aggiornaTutti(carrello);
 	}
 }
