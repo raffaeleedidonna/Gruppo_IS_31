@@ -23,6 +23,28 @@ public class Carrello {
 		return prodotto.isVendibilePer(totale);
 	}
 
+	public boolean puoModificare(Prodotto prodotto, long nuovaQuantita){
+
+		RigaCarrello riga = trovaRiga(prodotto);
+
+		if (riga == null){
+			return false;
+		}
+		return riga.puoImpostare(nuovaQuantita);
+	}
+
+	public void modificaQuantita(Prodotto prodotto, long nuovaQuantita){
+
+		RigaCarrello riga = trovaRiga(prodotto);
+
+		riga.impostaQuantita(nuovaQuantita);
+
+		if(nuovaQuantita == 0){
+			righe.remove(riga);
+		}
+
+	}
+
 	private long quantitaInCarrello(Prodotto prodotto) {
 		RigaCarrello riga = trovaRiga(prodotto);
 		return riga == null ? 0 : riga.getQuantita();
