@@ -5,6 +5,7 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import control.ControllerUtenti;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,12 +18,28 @@ public class FormRegistrazione {
 	private JTextField textField_cognome;
 	private JTextField textField_indirizzo;
 	private JTextField textField_immagine;
+	private JButton sfogliaButton;
 	private JButton confermaButton;
 	private JLabel label_esito;
 
 	private JFrame frame;
 
 	public FormRegistrazione() {
+		sfogliaButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser selettore = new JFileChooser();
+				selettore.setDialogTitle("Scegli l'immagine del profilo");
+				selettore.setAcceptAllFileFilterUsed(false);
+				selettore.setFileFilter(new FileNameExtensionFilter("Immagini (jpg, jpeg, png, gif)",
+						"jpg", "jpeg", "png", "gif"));
+
+				if (selettore.showOpenDialog(mainPanel) == JFileChooser.APPROVE_OPTION) {
+					textField_immagine.setText(selettore.getSelectedFile().getAbsolutePath());
+				}
+			}
+		});
+
 		confermaButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -106,8 +123,15 @@ public class FormRegistrazione {
 		final JLabel label6 = new JLabel();
 		label6.setText("Immagine profilo");
 		mainPanel.add(label6, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		final JPanel panel1 = new JPanel();
+		panel1.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
+		mainPanel.add(panel1, new GridConstraints(5, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
 		textField_immagine = new JTextField();
-		mainPanel.add(textField_immagine, new GridConstraints(5, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+		textField_immagine.setEditable(false);
+		panel1.add(textField_immagine, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+		sfogliaButton = new JButton();
+		sfogliaButton.setText("Sfoglia...");
+		panel1.add(sfogliaButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		label_esito = new JLabel();
 		label_esito.setText("");
 		mainPanel.add(label_esito, new GridConstraints(6, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
