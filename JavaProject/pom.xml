@@ -61,15 +61,12 @@
             <version>1.17.1</version>
         </dependency>
 
-        <!--
-            Runtime del GUI Designer di IntelliJ (file .form).
-            Scommenta SOLO se costruisci la boundary con il GUI Designer.
+        <!-- Runtime del GUI Designer di IntelliJ (file .form) -->
         <dependency>
             <groupId>com.intellij</groupId>
             <artifactId>forms_rt</artifactId>
             <version>7.0.3</version>
         </dependency>
-        -->
     </dependencies>
 
     <build>
