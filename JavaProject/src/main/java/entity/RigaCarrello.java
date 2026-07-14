@@ -19,6 +19,12 @@ public class RigaCarrello {
 		return this.prodotto.getId() == prodotto.getId();
 	}
 
+	public boolean puoImpostare(long nuovaQuantita) {
+
+		return prodotto.isVendibilePer(nuovaQuantita);
+
+	}
+
 	public double calcolaSubtotale() {
 		throw new UnsupportedOperationException();
 	}
@@ -31,8 +37,11 @@ public class RigaCarrello {
 
 	public RigaOrdine creaRigaOrdine() { return new RigaOrdine(prodotto, quantita); }
 
+	public void impostaQuantita(long nuovaQuantita) {quantita = nuovaQuantita;}
+
 	//Getter
 	public long getQuantita(){return quantita;}
 	public Prodotto getProdotto(){return prodotto;}
+
 
 }

@@ -66,6 +66,28 @@ public class ControllerCarrello {
 
 	}
 
+	public static boolean modificaQuantita(long idCliente, long idProdotto, long nuovaQuantita){
+
+		RegistroCarrello regc = new RegistroCarrello();
+
+		RegistroProdotti regp = new RegistroProdotti();
+
+		Carrello c = reg.cercaCarrelloPerCliente(idCliente);
+
+		Prodotto p = regp.cercaProdottoPerId(idProdotto);
+
+		boolean puoModificare = c.puoModificare(p, nuovaQuantita);
+
+		if(!puoModificare){
+			return false;
+		}
+
+		c.modificaQuantita(p, nuovaQuantita);
+
+		return regc.registraCarrello(c);
+
+	}
+
 	private static String[] toArray(RigaCarrello riga) {
 		Prodotto p = riga.getProdotto();
 		return new String[]{
@@ -75,5 +97,7 @@ public class ControllerCarrello {
 			String.valueOf(riga.getQuantita())
 		};
 	}
+
+
 
 }
