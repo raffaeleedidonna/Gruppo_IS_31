@@ -86,9 +86,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>${exec-maven-plugin.version}</version>
                 <configuration>
-                    <!-- Package flat: Main sta in src/main/java/Main.java (default package).
-                         Se la sposti in boundary/, metti qui boundary.Main -->
-                    <mainClass>Main</mainClass>
+                    <mainClass>boundary.Main</mainClass>
                 </configuration>
             </plugin>
         </plugins>
