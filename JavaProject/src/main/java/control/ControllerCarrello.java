@@ -72,7 +72,7 @@ public class ControllerCarrello {
 
 		RegistroProdotti regp = new RegistroProdotti();
 
-		Carrello c = reg.cercaCarrelloPerCliente(idCliente);
+		Carrello c = regc.cercaCarrelloPerCliente(idCliente);
 
 		Prodotto p = regp.cercaProdottoPerId(idProdotto);
 
