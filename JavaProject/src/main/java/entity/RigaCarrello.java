@@ -33,5 +33,6 @@ public class RigaCarrello {
 
 	//Getter
 	public long getQuantita(){return quantita;}
+	public Prodotto getProdotto(){return prodotto;}
 
 }

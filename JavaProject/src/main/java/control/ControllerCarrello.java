@@ -1,9 +1,10 @@
 package control;
 
-import entity.Carrello;
-import entity.Prodotto;
-import entity.RegistroCarrello;
-import entity.RegistroProdotti;
+import entity.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ControllerCarrello {
 
@@ -21,17 +22,58 @@ public class ControllerCarrello {
 		Carrello c = regc.cercaCarrelloPerCliente(idCliente);
 		Prodotto p = regp.cercaProdottoPerId(idProdotto);
 
-		if (p == null) {return PRODOTTO_NON_ESISTENTE;}
+		if (p == null) {
+			return PRODOTTO_NON_ESISTENTE;
+		}
 		// Il carrello non dovrebbe poter essere null perchè inizializzato a registrazione utente.
 		// Potremmo valutare di ritentare l'inizializzazione altrimenti il problema si ripresenterebbe.
-		if (c == null) {return ERRORE_DI_SISTEMA;}
+		if (c == null) {
+			return ERRORE_DI_SISTEMA;
+		}
 		// Teoricamente dovrebbe essere la boundary ad enforcare <=0 ma restiamo difensivi.
-		if (quantita <= 0) {return QUANTITA_NON_VALIDA;}
+		if (quantita <= 0) {
+			return QUANTITA_NON_VALIDA;
+		}
 		// Fondiamo in un solo errore scorta insufficiente e prodotto non disponibile.
-		if (!c.puoAggiungere(p, quantita)) {return NON_AGGIUNGIBILE;}
+		if (!c.puoAggiungere(p, quantita)) {
+			return NON_AGGIUNGIBILE;
+		}
 
 		c.aggiungiProdotto(p, quantita);
 
 		return regc.registraCarrello(c) ? PRODOTTO_AGGIUNTO : ERRORE_DI_SISTEMA;
 	}
+
+	public static List<String[]> getCarrello(long idCliente) {
+
+		RegistroCarrello reg = new RegistroCarrello();
+
+		Carrello c = reg.cercaCarrelloPerCliente(idCliente);
+
+		if (c == null) {
+			return Collections.emptyList();
+		}
+
+		List<RigaCarrello> righe = c.getRighe();
+
+		List<String[]> dati = new ArrayList<>(righe.size());
+
+		for (RigaCarrello riga : righe) {
+			dati.add(toArray(riga));
+		}
+
+		return dati;
+
+	}
+
+	private static String[] toArray(RigaCarrello riga) {
+		Prodotto p = riga.getProdotto();
+		return new String[]{
+			String.valueOf(p.getId()),
+			p.getNome(),
+			String.valueOf(p.getPrezzo()),
+			String.valueOf(riga.getQuantita())
+		};
+	}
+
 }

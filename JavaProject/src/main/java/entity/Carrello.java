@@ -18,10 +18,6 @@ public class Carrello {
 		this.righe = new ArrayList<RigaCarrello>();
 	}
 
-	public Cliente getCliente() {
-		return cliente;
-	}
-
 	public boolean puoAggiungere(Prodotto prodotto, long quantita) {
 		long totale = quantitaInCarrello(prodotto) + quantita;
 		return prodotto.isVendibilePer(totale);
@@ -69,4 +65,12 @@ public class Carrello {
 			ordine.aggiungiRiga(riga.creaRigaOrdine());
 		}
 	}
+
+
+	//Getter
+	public Cliente getCliente() {
+		return cliente;
+	}
+
+	public List<RigaCarrello> getRighe() {return righe;}
 }
