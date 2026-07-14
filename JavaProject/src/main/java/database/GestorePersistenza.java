@@ -243,6 +243,33 @@ public class GestorePersistenza {
 				}
 		}
 
+		public boolean aggiornaTutti(Object... oggetti) {
+				EntityManager em = JpaUtil.getInstance().getEntityManager();
+
+				try {
+						em.getTransaction().begin();
+
+						for (Object oggetto : oggetti) {
+								em.merge(oggetto);
+						}
+
+						em.getTransaction().commit();
+						return true;
+
+				} catch (RuntimeException e) {
+
+						if (em.getTransaction().isActive()) {
+								em.getTransaction().rollback();
+						}
+
+						e.printStackTrace();
+						return false;
+
+				} finally {
+						em.close();
+				}
+		}
+
 		public <T> boolean elimina(Class<T> classe, Long id) {
 
 				EntityManager em = JpaUtil.getInstance().getEntityManager();
