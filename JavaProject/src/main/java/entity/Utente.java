@@ -35,7 +35,7 @@ public abstract class Utente {
 
 	public abstract Ruolo ruolo();
 
-	public long getId() {return this.id;}
+	public long getId() {return id;}
 
-	public String getIndirizzo() { return this.indirizzo; }
+	public String getIndirizzo() {return indirizzo;}
 }
