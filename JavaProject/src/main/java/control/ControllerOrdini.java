@@ -2,10 +2,7 @@ package control;
 import java.util.ArrayList;
 import java.util.List;
 
-import entity.Carrello;
-import entity.Ordine;
-import entity.RegistroCarrello;
-import entity.RegistroOrdini;
+import entity.*;
 
 public class ControllerOrdini {
 	public static boolean confermaOrdine(long idCliente) {
@@ -27,15 +24,18 @@ public class ControllerOrdini {
 		List<String[]> righe = new ArrayList<>();
 
 		for (Ordine ordine : ordini){
-			String[] riga = new String[]{
-					String.valueOf(ordine.getId()),
-					ordine.getDataCreazione().toString(),
-					String.valueOf(ordine.getTotaleComplessivo()),
-					ordine.getIndirizzoSpedizione(),
-					ordine.getStato().name()
-			};
-			righe.add(riga);
+			righe.add(toArray(ordine));
 		}
 		return righe;
+	}
+
+	private static String[] toArray(Ordine ordine) {
+		return new String[]{
+			String.valueOf(ordine.getId()),
+			ordine.getDataCreazione().toString(),
+			String.valueOf(ordine.getTotaleComplessivo()),
+			ordine.getIndirizzoSpedizione(),
+			ordine.getStato().name()
+		};
 	}
 }
