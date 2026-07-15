@@ -114,21 +114,19 @@ public class FormCarrello {
 				return false;
 			}
 		};
-		BigDecimal totale = BigDecimal.ZERO;
 		for (String[] riga : righe) {
-			BigDecimal subtotale = new BigDecimal(riga[2]).multiply(new BigDecimal(riga[3]));
-			totale = totale.add(subtotale);
-			model.addRow(new String[]{riga[0], riga[1], riga[2], riga[3], formattaImporto(subtotale)});
+			model.addRow(new String[]{riga[0], riga[1], riga[2], riga[3], formattaImporto(Double.parseDouble(riga[4]))});
 		}
 		table_carrello.setModel(model);
 		table_carrello.removeColumn(table_carrello.getColumnModel().getColumn(0));
+		double totale = righe.isEmpty() ? 0 : Double.parseDouble(righe.get(0)[5]);
 		label_totale.setText("Totale: " + formattaImporto(totale) + " €");
 		label_esito.setForeground(Color.DARK_GRAY);
 		label_esito.setText(righe.isEmpty() ? "Il carrello è vuoto" : "Articoli nel carrello: " + righe.size());
 	}
 
-	private String formattaImporto(BigDecimal importo) {
-		return importo.setScale(2, RoundingMode.HALF_UP).toPlainString();
+	private String formattaImporto(double importo) {
+		return BigDecimal.valueOf(importo).setScale(2, RoundingMode.HALF_UP).toPlainString();
 	}
 
 	{

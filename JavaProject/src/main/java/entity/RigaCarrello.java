@@ -33,7 +33,7 @@ public class RigaCarrello {
 	}
 
 	public double calcolaSubtotale() {
-		throw new UnsupportedOperationException();
+		return prodotto.getPrezzo() * quantita;
 	}
 
 	public void incrementaQuantita(long quantita){

@@ -73,7 +73,11 @@ public class Carrello {
 	}
 
 	public double calcolaTotale() {
-		throw new UnsupportedOperationException();
+		double totale = 0;
+		for (RigaCarrello riga : righe) {
+			totale += riga.calcolaSubtotale();
+		}
+		return totale;
 	}
 
 	public void svuota() {

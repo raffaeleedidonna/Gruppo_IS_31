@@ -58,8 +58,10 @@ public class ControllerCarrello {
 
 		List<String[]> dati = new ArrayList<>(righe.size());
 
+		double totale = c.calcolaTotale();
+
 		for (RigaCarrello riga : righe) {
-			dati.add(toArray(riga));
+			dati.add(toArray(riga, totale));
 		}
 
 		return dati;
@@ -88,13 +90,15 @@ public class ControllerCarrello {
 
 	}
 
-	private static String[] toArray(RigaCarrello riga) {
+	private static String[] toArray(RigaCarrello riga, double totale) {
 		Prodotto p = riga.getProdotto();
 		return new String[]{
 			String.valueOf(p.getId()),
 			p.getNome(),
 			String.valueOf(p.getPrezzo()),
-			String.valueOf(riga.getQuantita())
+			String.valueOf(riga.getQuantita()),
+			String.valueOf(riga.calcolaSubtotale()),
+			String.valueOf(totale)
 		};
 	}
 
