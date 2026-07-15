@@ -79,9 +79,11 @@ public class ControllerCarrello {
 
 		Prodotto p = regp.cercaProdottoPerId(idProdotto);
 
-		boolean puoModificare = c.puoModificare(p, nuovaQuantita);
+		if (c == null || p == null) {
+			return false;
+		}
 
-		if(!puoModificare){
+		if(!c.puoModificare(p, nuovaQuantita)){
 			return false;
 		}
 
