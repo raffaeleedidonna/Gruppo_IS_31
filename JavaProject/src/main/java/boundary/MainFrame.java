@@ -30,7 +30,6 @@ public class MainFrame {
 
 		lbl_welcome.setText(amministratore ? "Benvenuto nell'area amministratore!" : "Benvenuto nell'area cliente!");
 		carrelloButton.setVisible(!amministratore);
-		ordiniButton.setVisible(amministratore);
 
 		catalogoButton.addActionListener(new ActionListener() {
 			@Override
@@ -60,7 +59,7 @@ public class MainFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (frameOrdini == null || !frameOrdini.isDisplayable()) {
-					frameOrdini = new FormOrdini().apriFormOrdini();
+					frameOrdini = new FormOrdini(idUtente, amministratore).apriFormOrdini();
 				} else {
 					frameOrdini.toFront();
 					frameOrdini.requestFocus();

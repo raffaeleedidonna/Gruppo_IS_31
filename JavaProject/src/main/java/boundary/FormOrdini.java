@@ -18,7 +18,13 @@ public class FormOrdini {
 	private JButton aggiornaButton;
 	private JLabel label_esito;
 
-	public FormOrdini() {
+	private final long idUtente;
+	private final boolean amministratore;
+
+	public FormOrdini(long idUtente, boolean amministratore) {
+		this.idUtente = idUtente;
+		this.amministratore = amministratore;
+
 		aggiornaButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -28,7 +34,7 @@ public class FormOrdini {
 	}
 
 	public JFrame apriFormOrdini() {
-		JFrame frame = new JFrame("Gestione ordini");
+		JFrame frame = new JFrame(amministratore ? "Gestione ordini" : "I miei ordini");
 		frame.setContentPane(mainPanel);
 		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		caricaOrdini();
@@ -39,8 +45,12 @@ public class FormOrdini {
 	}
 
 	private void caricaOrdini() {
-		List<String[]> righe = ControllerOrdini.getOrdini();
-		String[] colonne = {"Id", "Cliente", "Data", "Totale (€)", "Indirizzo di spedizione", "Stato"};
+		List<String[]> righe = amministratore
+				? ControllerOrdini.getOrdini()
+				: ControllerOrdini.getOrdini(idUtente);
+		String[] colonne = amministratore
+				? new String[]{"Id", "Cliente", "Data", "Totale (€)", "Indirizzo di spedizione", "Stato"}
+				: new String[]{"Id", "Data", "Totale (€)", "Indirizzo di spedizione", "Stato"};
 		DefaultTableModel model = new DefaultTableModel(colonne, 0) {
 			@Override
 			public boolean isCellEditable(int riga, int colonna) {
@@ -48,7 +58,9 @@ public class FormOrdini {
 			}
 		};
 		for (String[] riga : righe) {
-			model.addRow(new String[]{riga[0], riga[5], riga[1], riga[2], riga[3], riga[4]});
+			model.addRow(amministratore
+					? new String[]{riga[0], riga[5], riga[1], riga[2], riga[3], riga[4]}
+					: new String[]{riga[0], riga[1], riga[2], riga[3], riga[4]});
 		}
 		table_ordini.setModel(model);
 		table_ordini.setAutoCreateRowSorter(true);

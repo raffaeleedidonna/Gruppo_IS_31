@@ -77,6 +77,25 @@ class ControllerOrdiniTest extends BaseTestH2 {
 	}
 
 	@Test
+	@DisplayName("Elenco ordini filtrato per cliente")
+	void elencoOrdiniFiltratoPerCliente() {
+		Cliente primoCliente = creaCliente("mario@test.it", "password");
+		Cliente secondoCliente = creaCliente("luigi@test.it", "password");
+		Prodotto mouse = creaProdotto("Mouse", 25.0, 10, true);
+		Prodotto tastiera = creaProdotto("Tastiera", 50.0, 10, true);
+
+		ControllerCarrello.aggiungiAlCarrello(primoCliente.getId(), mouse.getId(), 2);
+		ControllerCarrello.aggiungiAlCarrello(secondoCliente.getId(), tastiera.getId(), 1);
+		ControllerOrdini.confermaOrdine(primoCliente.getId());
+		ControllerOrdini.confermaOrdine(secondoCliente.getId());
+
+		List<String[]> ordini = ControllerOrdini.getOrdini(primoCliente.getId());
+
+		assertEquals(1, ordini.size());
+		assertEquals(String.valueOf(primoCliente.getId()), ordini.get(0)[5]);
+	}
+
+	@Test
 	@DisplayName("L'ordine confermato nasce nello stato INSERITO col totale del carrello")
 	void lOrdineNasceInseritoColTotaleGiusto() {
 		Cliente cliente = creaCliente("mario@test.it", "password");

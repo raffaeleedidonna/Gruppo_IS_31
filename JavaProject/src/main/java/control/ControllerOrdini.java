@@ -43,6 +43,18 @@ public class ControllerOrdini {
 		return righe;
 	}
 
+	public static List<String[]> getOrdini(long idCliente) {
+
+		RegistroOrdini reg = new RegistroOrdini();
+		List<Ordine> ordini = reg.cercaOrdini(idCliente);
+		List<String[]> righe = new ArrayList<>();
+
+		for (Ordine ordine : ordini){
+			righe.add(toArray(ordine));
+		}
+		return righe;
+	}
+
 	private static String[] toArray(Ordine ordine) {
 		return new String[]{
 			String.valueOf(ordine.getId()),

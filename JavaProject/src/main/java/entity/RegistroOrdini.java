@@ -26,4 +26,8 @@ public class RegistroOrdini {
 	public List<Ordine> cercaOrdini() {
 		return gestorePersistenza.cercaPerCampi(Ordine.class, Map.of());
 	}
+
+	public List<Ordine> cercaOrdini(long idCliente) {
+		return gestorePersistenza.cercaPerCampi(Ordine.class, Map.of("cliente.id", idCliente));
+	}
 }
