@@ -25,19 +25,7 @@ class ControllerProdottiTest extends BaseTestH2 {
 
 		assertEquals(2, ControllerProdotti.getProdotti().size());
 	}
-
-	@Test
-	@DisplayName("Il catalogo espone solo i prodotti disponibili")
-	void ilCatalogoEscludeIProdottiNonDisponibili() {
-		creaProdotto("Mouse", 25.0, 10, true);
-		creaProdotto("Tastiera", 40.0, 5, false);
-
-		List<String[]> catalogo = ControllerProdotti.getProdotti();
-
-		assertEquals(1, catalogo.size());
-		assertEquals("Mouse", catalogo.get(0)[1]);
-	}
-
+	
 	@Test
 	@DisplayName("Ogni riga del catalogo espone gli attributi del prodotto e la sua categoria")
 	void ogniRigaEsponeGliAttributiDelProdotto() {

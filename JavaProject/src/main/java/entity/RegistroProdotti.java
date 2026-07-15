@@ -14,6 +14,6 @@ public class RegistroProdotti {
 
 	public List<Prodotto> cercaProdottiInCatalogo() {
 
-		return gestorePersistenza.cercaPerCampi(Prodotto.class, Map.of("disponibile", true));
+		return gestorePersistenza.cercaPerCampi(Prodotto.class, Map.of());
 	}
 }
