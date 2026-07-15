@@ -20,10 +20,22 @@ public class Prodotto {
 	@JoinColumn(name = "categoria_id")
 	private Categoria categoria;
 
+	protected Prodotto() {}
+
+	public Prodotto(String nome, String descrizione, double prezzo, long quantitaMagazzino, boolean disponibile, boolean inOfferta, Categoria categoria) {
+		this.nome = nome;
+		this.descrizione = descrizione;
+		this.prezzo = prezzo;
+		this.quantitaMagazzino = quantitaMagazzino;
+		this.disponibile = disponibile;
+		this.inOfferta = inOfferta;
+		this.categoria = categoria;
+	}
+
 	public void scarica(long quantita) { quantitaMagazzino -= quantita; }
 
 	public boolean isVendibilePer(long quantita) {
-		return disponibile && quantita <= quantitaMagazzino;
+		return disponibile && quantita > 0 && quantita <= quantitaMagazzino;
 	}
 
 	//Getter

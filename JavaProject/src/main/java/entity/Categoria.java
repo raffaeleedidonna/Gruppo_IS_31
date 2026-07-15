@@ -11,6 +11,12 @@ public class Categoria {
 
 	private String nome;
 
+	protected Categoria() {}
+
+	public Categoria(String nome) {
+		this.nome = nome;
+	}
+
 	//Getter
 	public String getNome() {return nome;}
 }

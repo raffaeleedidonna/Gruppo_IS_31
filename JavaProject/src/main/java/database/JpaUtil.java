@@ -14,6 +14,8 @@ public class JpaUtil {
 		 */
 		private static JpaUtil instance;
 
+		private static final String NOME_PU = System.getProperty("ecommerce.pu", "ecommercePU");
+
 		/*
 		 * EntityManagerFactory condivisa.
 		 *
@@ -41,7 +43,7 @@ public class JpaUtil {
 				 *
 				 * <persistence-unit name="ecommercePU">
 				 */
-				emf = Persistence.createEntityManagerFactory("ecommercePU");
+				emf = Persistence.createEntityManagerFactory(NOME_PU);
 		}
 
 		/*
