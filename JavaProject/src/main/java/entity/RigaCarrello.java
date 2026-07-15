@@ -28,7 +28,7 @@ public class RigaCarrello {
 
 	public boolean puoImpostare(long nuovaQuantita) {
 
-		return prodotto.isVendibilePer(nuovaQuantita);
+		return nuovaQuantita == 0 || prodotto.isVendibilePer(nuovaQuantita);
 
 	}
 
