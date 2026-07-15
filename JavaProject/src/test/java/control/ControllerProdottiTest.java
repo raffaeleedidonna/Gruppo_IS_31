@@ -25,7 +25,7 @@ class ControllerProdottiTest extends BaseTestH2 {
 
 		assertEquals(2, ControllerProdotti.getProdotti().size());
 	}
-	
+
 	@Test
 	@DisplayName("Ogni riga del catalogo espone gli attributi del prodotto e la sua categoria")
 	void ogniRigaEsponeGliAttributiDelProdotto() {

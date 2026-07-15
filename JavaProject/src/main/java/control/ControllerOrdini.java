@@ -7,17 +7,29 @@ import java.util.Locale;
 import entity.*;
 
 public class ControllerOrdini {
-	public static boolean confermaOrdine(long idCliente) {
+
+	public static final int CARRELLO_VUOTO = 0;
+	public static final int ERRORE_DI_SISTEMA = 1;
+	public static final int RIGA_NON_VENDIBILE = 2;
+	public static final int ORDINE_CONFERMATO = 3;
+
+	public static int confermaOrdine(long idCliente) {
 		RegistroCarrello reg_c = new RegistroCarrello();
 		RegistroOrdini reg_o = new RegistroOrdini();
 
 		Carrello carrello = reg_c.cercaCarrelloPerCliente(idCliente);
 
-		if (carrello == null || carrello.isEmpty()) {return false;}
+		if (carrello == null) {return ERRORE_DI_SISTEMA;}
 
-		if (!carrello.haTutteRigheVendibili()) {return false;}
+		if (carrello.isEmpty()) {return CARRELLO_VUOTO;}
 
-		return reg_o.registraOrdineDa(carrello);
+		if (!carrello.haTutteRigheVendibili()) {return RIGA_NON_VENDIBILE;}
+
+		boolean esito = reg_o.registraOrdineDa(carrello);
+
+		if(!esito){return ERRORE_DI_SISTEMA;}
+
+		return ORDINE_CONFERMATO;
 	}
 
 	public static List<String[]> getOrdini() {

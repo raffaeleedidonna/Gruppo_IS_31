@@ -76,17 +76,35 @@ public class FormCarrello {
 		confermaButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				boolean esito = ControllerOrdini.confermaOrdine(idCliente);
+				int esito = ControllerOrdini.confermaOrdine(idCliente);
 
-				if (esito) {
-					JOptionPane.showMessageDialog(mainPanel, "Ordine confermato!",
-							"Ordine confermato", JOptionPane.INFORMATION_MESSAGE);
-					caricaCarrello();
-				} else {
-					label_esito.setForeground(Color.RED);
-					label_esito.setText("Ordine non confermato");
-					JOptionPane.showMessageDialog(mainPanel, "Impossibile confermare: carrello vuoto o prodotti non più disponibili.",
-							"Ordine non confermato", JOptionPane.WARNING_MESSAGE);
+				switch (esito) {
+					case ControllerOrdini.ORDINE_CONFERMATO:
+						label_esito.setForeground(new Color(0, 128, 0));
+						label_esito.setText("Ordine confermato");
+						JOptionPane.showMessageDialog(mainPanel, "Ordine confermato!",
+								"Ordine confermato", JOptionPane.INFORMATION_MESSAGE);
+						caricaCarrello();
+						break;
+					case ControllerOrdini.CARRELLO_VUOTO:
+						label_esito.setForeground(Color.RED);
+						label_esito.setText("Carrello vuoto");
+						JOptionPane.showMessageDialog(mainPanel, "Impossibile confermare: il carrello è vuoto.",
+								"Carrello vuoto", JOptionPane.WARNING_MESSAGE);
+						break;
+					case ControllerOrdini.RIGA_NON_VENDIBILE:
+						label_esito.setForeground(Color.RED);
+						label_esito.setText("Righe non vendibili");
+						JOptionPane.showMessageDialog(mainPanel, "Alcune righe del carrello hanno una quantità maggiore di quella disponibile in magazzino. Ricontrolla il carrello.",
+								"Righe non vendibili", JOptionPane.WARNING_MESSAGE);
+						break;
+					case ControllerOrdini.ERRORE_DI_SISTEMA:
+					default:
+						label_esito.setForeground(Color.RED);
+						label_esito.setText("Errore di sistema");
+						JOptionPane.showMessageDialog(mainPanel, "Errore di sistema. Riprova più tardi.",
+								"Errore", JOptionPane.ERROR_MESSAGE);
+						break;
 				}
 			}
 		});

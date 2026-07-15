@@ -10,7 +10,6 @@ import support.BaseTestH2;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ControllerOrdiniTest extends BaseTestH2 {
@@ -24,7 +23,8 @@ class ControllerOrdiniTest extends BaseTestH2 {
 		Prodotto mouse = creaProdotto("Mouse", 25.0, 10, true);
 		ControllerCarrello.aggiungiAlCarrello(cliente.getId(), mouse.getId(), 2);
 
-		assertTrue(ControllerOrdini.confermaOrdine(cliente.getId()));
+		assertEquals(ControllerOrdini.ORDINE_CONFERMATO,
+				ControllerOrdini.confermaOrdine(cliente.getId()));
 	}
 
 	@Test
@@ -32,7 +32,8 @@ class ControllerOrdiniTest extends BaseTestH2 {
 	void confermaDiUnCarrelloVuoto() {
 		Cliente cliente = creaCliente("mario@test.it", "password");
 
-		assertFalse(ControllerOrdini.confermaOrdine(cliente.getId()));
+		assertEquals(ControllerOrdini.CARRELLO_VUOTO,
+				ControllerOrdini.confermaOrdine(cliente.getId()));
 	}
 
 	@Test
@@ -44,13 +45,15 @@ class ControllerOrdiniTest extends BaseTestH2 {
 
 		rendiNonDisponibile(mouse.getId());
 
-		assertFalse(ControllerOrdini.confermaOrdine(cliente.getId()));
+		assertEquals(ControllerOrdini.RIGA_NON_VENDIBILE,
+				ControllerOrdini.confermaOrdine(cliente.getId()));
 	}
 
 	@Test
 	@DisplayName("TCBB29 - Conferma per un cliente senza carrello")
 	void confermaPerClienteInesistente() {
-		assertFalse(ControllerOrdini.confermaOrdine(ID_CLIENTE_INESISTENTE));
+		assertEquals(ControllerOrdini.ERRORE_DI_SISTEMA,
+				ControllerOrdini.confermaOrdine(ID_CLIENTE_INESISTENTE));
 	}
 
 	@Test
