@@ -47,13 +47,8 @@ public class FormAccesso {
 
 				long idUtente = Long.parseLong(risultato[0]);
 
-				if (risultato[1].equals("CLIENTE")) {
-					new FormNegozio(idUtente).apriFormNegozio();
-					frame.dispose();
-				} else {
-					new FormOrdini().apriFormOrdini();
-					frame.dispose();
-				}
+				new MainFrame(idUtente, risultato[1]).apriMainFrame();
+				frame.dispose();
 			}
 		});
 

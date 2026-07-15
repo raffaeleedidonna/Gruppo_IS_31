@@ -16,19 +16,24 @@ import java.util.List;
 public class FormNegozio {
 	private JPanel mainPanel;
 	private JButton aggiornaButton;
-	private JButton carrelloButton;
 	private JTable table_prodotti;
+	private JLabel label_quantita;
 	private JSpinner spinner_quantita;
 	private JButton aggiungiButton;
 	private JLabel label_esito;
 
-	private final long idCliente;
-	private JFrame frameCarrello;
+	private final long idUtente;
+	private final boolean soloLettura;
 
-	public FormNegozio(long idCliente) {
-		this.idCliente = idCliente;
+	public FormNegozio(long idUtente, boolean soloLettura) {
+		this.idUtente = idUtente;
+		this.soloLettura = soloLettura;
 		spinner_quantita.setModel(new SpinnerNumberModel(1, 1, 999, 1));
 		table_prodotti.setAutoCreateRowSorter(true);
+
+		label_quantita.setVisible(!soloLettura);
+		spinner_quantita.setVisible(!soloLettura);
+		aggiungiButton.setVisible(!soloLettura);
 
 		aggiornaButton.addActionListener(new ActionListener() {
 			@Override
@@ -36,6 +41,10 @@ public class FormNegozio {
 				caricaCatalogo();
 			}
 		});
+
+		if (soloLettura) {
+			return;
+		}
 
 		aggiungiButton.addActionListener(new ActionListener() {
 			@Override
@@ -50,7 +59,7 @@ public class FormNegozio {
 				long idProdotto = Long.parseLong(table_prodotti.getModel().getValueAt(riga, 0).toString());
 				long quantita = ((Number) spinner_quantita.getValue()).longValue();
 
-				int esito = ControllerCarrello.aggiungiAlCarrello(idCliente, idProdotto, quantita);
+				int esito = ControllerCarrello.aggiungiAlCarrello(idUtente, idProdotto, quantita);
 
 				switch (esito) {
 					case ControllerCarrello.PRODOTTO_AGGIUNTO:
@@ -85,24 +94,12 @@ public class FormNegozio {
 				}
 			}
 		});
-
-		carrelloButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (frameCarrello == null || !frameCarrello.isDisplayable()) {
-					frameCarrello = new FormCarrello(idCliente).apriFormCarrello();
-				} else {
-					frameCarrello.toFront();
-					frameCarrello.requestFocus();
-				}
-			}
-		});
 	}
 
 	public JFrame apriFormNegozio() {
-		JFrame frame = new JFrame("Negozio");
+		JFrame frame = new JFrame(soloLettura ? "Catalogo prodotti" : "Negozio");
 		frame.setContentPane(mainPanel);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		caricaCatalogo();
 		frame.pack();
 		frame.setLocationRelativeTo(null);
@@ -112,7 +109,7 @@ public class FormNegozio {
 
 	private void caricaCatalogo() {
 		List<String[]> righe = ControllerProdotti.getProdotti();
-		String[] colonne = {"Id", "Nome", "Descrizione", "Prezzo (€)", "Disponibile", "In offerta", "Categoria"};
+		String[] colonne = {"Id", "Nome", "Descrizione", "Prezzo (€)", "Quantità", "Disponibile", "In offerta", "Categoria"};
 		DefaultTableModel model = new DefaultTableModel(colonne, 0) {
 			@Override
 			public boolean isCellEditable(int riga, int colonna) {
@@ -120,9 +117,7 @@ public class FormNegozio {
 			}
 		};
 		for (String[] riga : righe) {
-			String disponibile = Boolean.parseBoolean(riga[5]) ? "Sì" : "No";
-			String inOfferta = Boolean.parseBoolean(riga[6]) ? "Sì" : "No";
-			model.addRow(new String[]{riga[0], riga[1], riga[2], riga[3], disponibile, inOfferta, riga[7]});
+			model.addRow(riga);
 		}
 		table_prodotti.setModel(model);
 		table_prodotti.removeColumn(table_prodotti.getColumnModel().getColumn(0));
@@ -142,16 +137,13 @@ public class FormNegozio {
 		mainPanel.setLayout(new GridLayoutManager(3, 1, new Insets(10, 10, 10, 10), -1, -1));
 		mainPanel.setPreferredSize(new Dimension(900, 500));
 		final JPanel panel1 = new JPanel();
-		panel1.setLayout(new GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
+		panel1.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
 		mainPanel.add(panel1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
 		aggiornaButton = new JButton();
 		aggiornaButton.setText("Aggiorna");
 		panel1.add(aggiornaButton, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		final Spacer spacer1 = new Spacer();
 		panel1.add(spacer1, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
-		carrelloButton = new JButton();
-		carrelloButton.setText("Carrello");
-		panel1.add(carrelloButton, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		final JScrollPane scrollPane1 = new JScrollPane();
 		mainPanel.add(scrollPane1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
 		table_prodotti = new JTable();
@@ -159,9 +151,9 @@ public class FormNegozio {
 		final JPanel panel2 = new JPanel();
 		panel2.setLayout(new GridLayoutManager(1, 5, new Insets(0, 0, 0, 0), -1, -1));
 		mainPanel.add(panel2, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-		final JLabel label1 = new JLabel();
-		label1.setText("Quantità:");
-		panel2.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		label_quantita = new JLabel();
+		label_quantita.setText("Quantità:");
+		panel2.add(label_quantita, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		spinner_quantita = new JSpinner();
 		panel2.add(spinner_quantita, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(60, -1), null, 0, false));
 		aggiungiButton = new JButton();

@@ -11,8 +11,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 
 public class FormCarrello {
@@ -115,18 +113,13 @@ public class FormCarrello {
 			}
 		};
 		for (String[] riga : righe) {
-			model.addRow(new String[]{riga[0], riga[1], riga[2], riga[3], formattaImporto(Double.parseDouble(riga[4]))});
+			model.addRow(new String[]{riga[0], riga[1], riga[2], riga[3], riga[4]});
 		}
 		table_carrello.setModel(model);
 		table_carrello.removeColumn(table_carrello.getColumnModel().getColumn(0));
-		double totale = righe.isEmpty() ? 0 : Double.parseDouble(righe.get(0)[5]);
-		label_totale.setText("Totale: " + formattaImporto(totale) + " €");
+		label_totale.setText(righe.isEmpty() ? "" : "Totale: " + righe.get(0)[5] + " €");
 		label_esito.setForeground(Color.DARK_GRAY);
 		label_esito.setText(righe.isEmpty() ? "Il carrello è vuoto" : "Articoli nel carrello: " + righe.size());
-	}
-
-	private String formattaImporto(double importo) {
-		return BigDecimal.valueOf(importo).setScale(2, RoundingMode.HALF_UP).toPlainString();
 	}
 
 	{

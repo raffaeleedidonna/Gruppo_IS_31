@@ -6,6 +6,7 @@ import entity.RigaCarrello;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ControllerProdotti {
 
@@ -26,10 +27,10 @@ public class ControllerProdotti {
 			String.valueOf(p.getId()),
 			p.getNome(),
 			p.getDescrizione(),
-			String.valueOf(p.getPrezzo()),
+			String.format(Locale.ROOT, "%.2f", p.getPrezzo()),
 			String.valueOf(p.getQuantitaMagazzino()),
-			String.valueOf(p.isDisponibile()),
-			String.valueOf(p.isInOfferta()),
+			p.isDisponibile() ? "Sì" : "No",
+			p.isInOfferta() ? "Sì" : "No",
 			String.valueOf(p.getCategoria().getNome()),
 		};
 	}

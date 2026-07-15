@@ -5,6 +5,7 @@ import entity.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public class ControllerCarrello {
 
@@ -95,10 +96,10 @@ public class ControllerCarrello {
 		return new String[]{
 			String.valueOf(p.getId()),
 			p.getNome(),
-			String.valueOf(p.getPrezzo()),
+			String.format(Locale.ROOT, "%.2f", p.getPrezzo()),
 			String.valueOf(riga.getQuantita()),
-			String.valueOf(riga.calcolaSubtotale()),
-			String.valueOf(totale)
+			String.format(Locale.ROOT, "%.2f", riga.calcolaSubtotale()),
+			String.format(Locale.ROOT, "%.2f", totale)
 		};
 	}
 

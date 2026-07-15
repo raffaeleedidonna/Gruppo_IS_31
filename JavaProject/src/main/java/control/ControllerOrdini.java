@@ -1,6 +1,8 @@
 package control;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import entity.*;
 
@@ -32,8 +34,8 @@ public class ControllerOrdini {
 	private static String[] toArray(Ordine ordine) {
 		return new String[]{
 			String.valueOf(ordine.getId()),
-			ordine.getDataCreazione().toString(),
-			String.valueOf(ordine.getTotaleComplessivo()),
+			ordine.getDataCreazione().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")),
+			String.format(Locale.ROOT, "%.2f", ordine.getTotaleComplessivo()),
 			ordine.getIndirizzoSpedizione(),
 			ordine.getStato().name(),
 			String.valueOf(ordine.getCliente().getId()),

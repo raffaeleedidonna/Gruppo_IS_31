@@ -10,8 +10,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class FormOrdini {
@@ -32,7 +30,7 @@ public class FormOrdini {
 	public JFrame apriFormOrdini() {
 		JFrame frame = new JFrame("Gestione ordini");
 		frame.setContentPane(mainPanel);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		caricaOrdini();
 		frame.pack();
 		frame.setLocationRelativeTo(null);
@@ -49,10 +47,8 @@ public class FormOrdini {
 				return false;
 			}
 		};
-		DateTimeFormatter formatoData = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 		for (String[] riga : righe) {
-			String data = LocalDateTime.parse(riga[1]).format(formatoData);
-			model.addRow(new String[]{riga[0], riga[5], data, riga[2], riga[3], riga[4]});
+			model.addRow(new String[]{riga[0], riga[5], riga[1], riga[2], riga[3], riga[4]});
 		}
 		table_ordini.setModel(model);
 		table_ordini.setAutoCreateRowSorter(true);
