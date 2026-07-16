@@ -37,5 +37,7 @@ public abstract class Utente {
 
 	public long getId() {return id;}
 
+	public String getEmail() {return email;}
+
 	public String getIndirizzo() {return indirizzo;}
 }

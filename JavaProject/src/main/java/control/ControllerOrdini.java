@@ -7,6 +7,7 @@ import java.util.Locale;
 import entity.*;
 
 public class ControllerOrdini {
+
 	public static boolean confermaOrdine(long idCliente) {
 		RegistroCarrello reg_c = new RegistroCarrello();
 		RegistroOrdini reg_o = new RegistroOrdini();
@@ -17,7 +18,15 @@ public class ControllerOrdini {
 
 		if (!carrello.haTutteRigheVendibili()) {return false;}
 
-		return reg_o.registraOrdineDa(carrello);
+		String email = carrello.getCliente().getEmail();
+
+		boolean registrato = reg_o.registraOrdineDa(carrello);
+
+		if (registrato) {
+			GestoreNotifiche.getInstance().invia(email, "Ordine confermato",
+				"Il tuo ordine è stato registrato correttamente.");
+		}
+		return registrato;
 	}
 
 	public static List<String[]> getOrdini() {
