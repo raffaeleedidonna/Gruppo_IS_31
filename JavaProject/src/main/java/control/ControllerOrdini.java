@@ -29,6 +29,10 @@ public class ControllerOrdini {
 
 		if(!esito){return ERRORE_DI_SISTEMA;}
 
+		String email = carrello.getCliente().getEmail();
+
+		GestoreNotifiche.getInstance().invia(email, "Ordine confermato", "Il tuo ordine è stato registrato correttamente.");
+
 		return ORDINE_CONFERMATO;
 	}
 

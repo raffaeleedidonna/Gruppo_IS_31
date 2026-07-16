@@ -38,7 +38,13 @@ public class ControllerUtenti {
 		if (utente!=null) {return false;}
 
 		byte[] bytes = leggiBytesImmagine(percorsoImmagineProfilo);
-		return reg.registraCliente(email, hashPassword(password), nome, cognome, indirizzo, bytes);
+		boolean registrato = reg.registraCliente(email, hashPassword(password), nome, cognome, indirizzo, bytes);
+
+		if (registrato) {
+			GestoreNotifiche.getInstance().invia(email, "Benvenuto",
+				"La tua registrazione è andata a buon fine.");
+		}
+		return registrato;
 	}
 
 	public static String[] autentica(String email, String password) {
